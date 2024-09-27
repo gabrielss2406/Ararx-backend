@@ -1,11 +1,30 @@
 from typing import Union
-
+from connection.database import MongoDB
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from api.services.db import connect_mongo
 
 app = FastAPI()
 
+
+mongo = MongoDB("mongodb+srv://jmcoutinhonunes:fDwopvSSt1p28IAQ@ararx.4sw1u.mongodb.net/?retryWrites=true&w=majority&appName=ararx", "ararx")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Inicializa a conexão com o MongoDB no início
+    await mongo.connect()
+    print("Connected to MongoDB")
+
+    # Disponibiliza a aplicação
+    yield
+
+    # Fecha a conexão com o MongoDB no final
+    await mongo.close()
+    print("Closed MongoDB connection")
+
+# Passa o gerenciador de ciclo de vida para o FastAPI
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def read_root():
