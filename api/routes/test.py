@@ -1,25 +1,21 @@
 from typing import Union
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Security
 
-from api.services.db import connect_mongo
+from api.dependencies import get_current_user
+from api.models.UsersModels import UserOut
+from api.services.user.read import get_user
 
 router = APIRouter(
     prefix="/test",
-    tags=['test']
+    tags=['test'],
+    dependencies=[Security(get_current_user)]
 )
 
 
 # Testando a conexão com o banco de dados. Deve ser removido posteriormente
-@router.get("/")
-def read_test() -> Union[list[dict], None]:
-    collection, client = connect_mongo('Users')
-    result = collection.find({})
+@router.get("/{user_id}")
+def read_test(user_id) -> Union[UserOut, None]:
+    user = get_user(username=user_id)
 
-    documents: list[dict] = []
-
-    for document in result:
-        document["_id"] = str(document["_id"])
-        documents.append(document)
-
-    return documents
+    return user
