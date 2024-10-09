@@ -2,13 +2,17 @@ from typing import Union
 from connection.database import MongoDB
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-
 from api.services.db import connect_mongo
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 app = FastAPI()
 
 
-mongo = MongoDB("mongodb+srv://jmcoutinhonunes:fDwopvSSt1p28IAQ@ararx.4sw1u.mongodb.net/?retryWrites=true&w=majority&appName=ararx", "ararx")
+MONGO_URI = os.getenv("MONGO_URI")
+
+mongo = MongoDB(MONGO_URI, "ararx")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
