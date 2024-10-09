@@ -6,8 +6,16 @@ from api.services.db import connect_mongo
 from dotenv import load_dotenv
 import os
 
+from fastapi import FastAPI
+
+from api.routes import test, register, login
+
 load_dotenv()
 app = FastAPI()
+
+app.include_router(test.router)
+app.include_router(register.router)
+app.include_router(login.router)
 
 
 MONGO_URI = os.getenv("MONGO_URI")
@@ -33,18 +41,3 @@ app = FastAPI(lifespan=lifespan)
 @app.get("/")
 def read_root():
     return
-
-
-# Testando a conexão com o banco de dados. Deve ser removido posteriormente
-@app.get("/test")
-def read_test() -> Union[list[dict], None]:
-    collection, client = connect_mongo('Users')
-    result = collection.find({})
-
-    documents: list[dict] = []
-
-    for document in result:
-        document["_id"] = str(document["_id"])
-        documents.append(document)
-
-    return documents
