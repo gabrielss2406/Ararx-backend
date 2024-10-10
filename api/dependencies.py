@@ -49,7 +49,7 @@ def get_password_hash(password: str):
 async def authenticate_user(username: str, password: str) -> Union[UserOut, False]:
     user: Union[UserOut, None]
 
-    user = get_user(username)
+    user = await get_user(username)
 
     if not user:
         return False
@@ -84,7 +84,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Uni
         token_data = TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
-    user = get_user(username=token_data.username)
+    user = await get_user(username=token_data.username)
     if user is None:
         raise credentials_exception
     return user

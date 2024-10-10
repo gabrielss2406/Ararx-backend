@@ -12,7 +12,7 @@ from api.models.structural.TokenModels import Token
 
 router = APIRouter(
     prefix="/login",
-    tags=["login"]
+    tags=["login"],
 )
 
 load_dotenv()
