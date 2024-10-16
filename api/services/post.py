@@ -1,10 +1,9 @@
 from typing import Optional, List
-from api.models.PostModels import PostOut, PostUpdateQuery, Message
-from motor.motor_asyncio import AsyncIOMotorClient
+from api.models.PostModels import PostOut, PostUpdateQuery
 from datetime import datetime
 from dotenv import load_dotenv
 import os
-from api.services.db.database import MongoDB
+from api.connection.database import MongoDB
 
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
