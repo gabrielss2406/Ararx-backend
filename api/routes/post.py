@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Query, HTTPException, status
 from typing import List, Optional
-from api.models.PostModels import PostOut, PostUpdateQuery, Message, StudentOrderByEnum
+
+from api.models.Message import Message
+from api.models.PostModels import PostOut, PostUpdateQuery, PostOrderByEnum
 import logging
 from api.services.post import (
     create_new_post,
@@ -49,7 +51,7 @@ async def create_post(post_id: str, posted_by: str) -> Message:
 async def get_posts(
     page_num: int = Query(1, gt=0),
     page_size: int = Query(10, gt=0),
-    order_by: Optional[StudentOrderByEnum] = None,
+    order_by: Optional[PostOrderByEnum] = None,
     desc: bool = False,
 ) -> List[PostOut]:
     """Recupera uma lista paginada de posts."""

@@ -6,7 +6,8 @@ import os
 
 from fastapi import FastAPI
 
-from api.routes import test, register, login
+from api.routes import test, register, login, post
+
 
 # load_dotenv()
 #
@@ -35,10 +36,11 @@ async def lifespan(app: FastAPI):
 
 # Passa o gerenciador de ciclo de vida para o FastAPI
 app = FastAPI(lifespan=lifespan)
+
 app.include_router(test.router)
 app.include_router(register.router)
 app.include_router(login.router)
-
+app.include_router(post.router)
 
 @app.get("/")
 def read_root():
