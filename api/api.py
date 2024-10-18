@@ -1,19 +1,9 @@
 from api.helpers.mongo_instance import mongo
-from api.services.db.database import MongoDB
 from contextlib import asynccontextmanager
-from dotenv import load_dotenv
-import os
 
 from fastapi import FastAPI
 
 from api.routes import test, register, login, post
-
-
-# load_dotenv()
-#
-# MONGO_URI = os.getenv("MONGO_URI")
-#
-# mongo = MongoDB(MONGO_URI, "ararx")
 
 
 @asynccontextmanager
@@ -41,6 +31,7 @@ app.include_router(test.router)
 app.include_router(register.router)
 app.include_router(login.router)
 app.include_router(post.router)
+
 
 @app.get("/")
 def read_root():
