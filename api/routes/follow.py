@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status, Security
-from api.services.user_service import follow_user_service, unfollow_user_service
+from api.services.user.follow import follow_user_service, unfollow_user_service
 from dotenv import load_dotenv
 from api.dependencies import get_current_user, get_api_key
 
