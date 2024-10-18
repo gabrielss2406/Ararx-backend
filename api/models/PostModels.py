@@ -1,3 +1,5 @@
+from enum import Enum
+
 from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
@@ -25,3 +27,10 @@ class PostUpdateQuery(BaseModel):
     likes: Optional[int] = Field(default=0)
     id: Optional[int] = Field(default=1)
     date: Optional[datetime] = datetime.now()
+
+
+class PostOrderByEnum(Enum):
+    id = 'id'
+    author = 'author'
+    date = 'date'
+    likes = 'likes'
