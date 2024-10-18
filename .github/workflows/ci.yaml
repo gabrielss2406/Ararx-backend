@@ -1,0 +1,42 @@
+name: Test API with FastAPI and Postman
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Start FastAPI server
+        run: |
+          source venv/bin/activate
+          nohup python -m uvicorn api.api:app --reload --host 0.0.0.0 --port 8000 &
+          sleep 5
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman tests with environment
+        run: newman run tests/Routes.postman_collection.json -e tests/local.postman_environment.json
