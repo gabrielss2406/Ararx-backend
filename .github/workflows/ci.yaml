@@ -48,4 +48,4 @@ jobs:
         run: npm install -g newman
 
       - name: Run Postman tests with environment
-        run: newman run tests/sua-colecao.postman_collection.json -e tests/ambiente.postman_environment.json
+        run: newman run tests/Routes.postman_collection.json -e tests/local.postman_environment.json
