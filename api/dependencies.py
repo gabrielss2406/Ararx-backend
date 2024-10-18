@@ -29,7 +29,7 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 
-async def get_api_key(X_API_Key: str = Security(api_key_header)):
+def get_api_key(X_API_Key: str = Security(api_key_header)):
     if X_API_Key == os.getenv("API_KEY"):
         return X_API_Key
     else:
@@ -46,7 +46,7 @@ def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 
-async def authenticate_user(username: str, password: str) -> Union[UserOut, False]:
+def authenticate_user(username: str, password: str) -> Union[UserOut, False]:
     user: Union[UserOut, None]
 
     user = get_user(username)
@@ -69,7 +69,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Union[UserOut, None]:
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Union[UserOut, None]:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

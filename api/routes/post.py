@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Query, HTTPException, status
 from typing import List, Optional
-from api.models.PostModels import PostOut, PostUpdateQuery, Message, StudentOrderByEnum
+
+from api.models.Message import Message
+from api.models.PostModels import PostOut, PostUpdateQuery, PostOrderByEnum
 import logging
 from api.services.post import (
     create_new_post,
@@ -27,10 +29,10 @@ def not_found_exception(post_id: str) -> HTTPException:
 
 
 @router.post("/", summary="Create a new post")
-async def create_post(post_id: str, posted_by: str) -> Message:
+def create_post(post_id: str, posted_by: str) -> Message:
     """Cria um novo post com um ID único."""
     try:
-        result = await create_new_post(post_id, posted_by)
+        result = create_new_post(post_id, posted_by)
         if not result:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -46,15 +48,15 @@ async def create_post(post_id: str, posted_by: str) -> Message:
 
 
 @router.get("/", summary="Get a list of posts")
-async def get_posts(
+def get_posts(
     page_num: int = Query(1, gt=0),
     page_size: int = Query(10, gt=0),
-    order_by: Optional[StudentOrderByEnum] = None,
+    order_by: Optional[PostOrderByEnum] = None,
     desc: bool = False,
 ) -> List[PostOut]:
     """Recupera uma lista paginada de posts."""
     try:
-        posts = await get_all_posts(page_num, page_size, order_by, desc)
+        posts = get_all_posts(page_num, page_size, order_by, desc)
         if not posts:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="No posts found."
@@ -69,10 +71,10 @@ async def get_posts(
 
 
 @router.get("/{post_id}", summary="Get details of a specific post")
-async def get_post(post_id: str) -> PostOut:
+def get_post(post_id: str) -> PostOut:
     """Recupera os detalhes de um post específico pelo ID."""
     try:
-        post = await get_post_by_id(post_id)
+        post = get_post_by_id(post_id)
         if not post:
             raise not_found_exception(post_id)
         return post
@@ -85,10 +87,10 @@ async def get_post(post_id: str) -> PostOut:
 
 
 @router.put("/{post_id}", summary="Update a post")
-async def update_post(post_id: str, query: PostUpdateQuery) -> Message:
+def update_post(post_id: str, query: PostUpdateQuery) -> Message:
     """Atualiza um post pelo ID."""
     try:
-        result = await update_post_by_id(post_id, query)
+        result = update_post_by_id(post_id, query)
         if not result:
             raise not_found_exception(post_id)
         return Message(detail="Post updated successfully.")
@@ -101,10 +103,10 @@ async def update_post(post_id: str, query: PostUpdateQuery) -> Message:
 
 
 @router.post("/{post_id}/like", summary="Like a post")
-async def like_post(post_id: str, user_handler: str) -> Message:
+def like_post(post_id: str, user_handler: str) -> Message:
     """Adiciona um like a um post."""
     try:
-        result = await like_post_by_id(post_id, user_handler)
+        result = like_post_by_id(post_id, user_handler)
         if not result:
             raise not_found_exception(post_id)
         return Message(detail="Post liked successfully.")
@@ -117,10 +119,10 @@ async def like_post(post_id: str, user_handler: str) -> Message:
 
 
 @router.post("/{post_id}/dislike", summary="Dislike a post")
-async def dislike_post(post_id: str, user_handler: str) -> Message:
+def dislike_post(post_id: str, user_handler: str) -> Message:
     """Adiciona um dislike a um post."""
     try:
-        result = await dislike_post_by_id(post_id, user_handler)
+        result = dislike_post_by_id(post_id, user_handler)
         if not result:
             raise not_found_exception(post_id)
         return Message(detail="Post disliked successfully.")
@@ -133,10 +135,10 @@ async def dislike_post(post_id: str, user_handler: str) -> Message:
 
 
 @router.delete("/{post_id}", summary="Delete a post")
-async def delete_post(post_id: str) -> Message:
+def delete_post(post_id: str) -> Message:
     """Exclui um post pelo ID."""
     try:
-        result = await delete_post_by_id(post_id)
+        result = delete_post_by_id(post_id)
         if not result:
             raise not_found_exception(post_id)
         return Message(detail="Post deleted successfully.")

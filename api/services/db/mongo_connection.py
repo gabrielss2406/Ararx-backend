@@ -14,8 +14,6 @@ client = MongoClient(
     minPoolSize=5
 )
 
-print(client)
-
 
 def connect_mongo(collection_name: str) -> tuple[Collection, MongoClient]:
     try:

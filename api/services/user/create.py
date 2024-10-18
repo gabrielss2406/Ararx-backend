@@ -3,13 +3,18 @@ from typing import Union
 from starlette import status
 from starlette.exceptions import HTTPException
 
+import api.api
 from api.dependencies import get_password_hash
+from api.helpers.mongo_instance import mongo
 from api.models.UsersModels import UserIn, UserOut
 from api.services.db import connect_mongo
 
 
 def create_user(user: UserIn) -> Union[UserOut, None]:
-    collection, client = connect_mongo('Users')
+    if mongo.db is None:
+        raise Exception("MongoDB connection not established.")
+
+    collection, _ = connect_mongo('Users')
     user.password = get_password_hash(user.password)
 
     try:
