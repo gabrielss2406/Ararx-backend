@@ -23,9 +23,9 @@ ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
 @router.post("/", response_model=Token, summary="Register one user")
-async def register_student(user: UserIn) -> Token:
+def register_student(user: UserIn) -> Token:
     try:
-        result = await create_user(user)
+        result = create_user(user)
 
         if not result:
             raise HTTPException(

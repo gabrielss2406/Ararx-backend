@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
 load_dotenv()
@@ -25,9 +25,9 @@ class MongoDB:
     # func pra conectar
     async def connect(self):
         try:
-            self.client = AsyncIOMotorClient(self.uri)
+            self.client = MongoClient(self.uri)
             self.db = self.client[self.db_name]
-            await self.db.command("ping")
+            self.db.command("ping")
             print("Successfully connected to MongoDB!")
         except ConnectionFailure as e:
             print(f"Failed to connect to MongoDB: {e}")

@@ -15,7 +15,7 @@ router = APIRouter(
 
 # Testando a conexão com o banco de dados. Deve ser removido posteriormente
 @router.get("/{user_id}")
-async def read_test(user_id) -> Union[UserOut, None]:
-    user = await get_user(username=user_id)
+def read_test(user_id) -> Union[UserOut, None]:
+    user = get_user(username=user_id)
 
     return user
