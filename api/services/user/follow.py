@@ -1,15 +1,13 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import HTTPException, status
 from typing import Optional
-
-# Inicializa o cliente MongoDB (assumindo que a URI está em uma variável de ambiente)
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 client = AsyncIOMotorClient(MONGO_URI)
-db = client.get_database("social_app")  # Nome do banco de dados
+db = client.get_database("ararx")
 
 
 # Função para seguir um usuário
