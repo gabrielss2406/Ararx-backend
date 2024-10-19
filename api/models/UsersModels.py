@@ -31,8 +31,7 @@ class UserOut(UserIn):
 
 
 class UserUpdateQuery(BaseModel):
-    email: Optional[EmailStr] = Field(max_length=60)
-    password: Optional[str] = Field(max_length=60)
-    handler: Optional[str] = Field(max_length=60)
-    bio: Optional[str] = Field(max_length=240)
-    username: Optional[str] = Field(max_length=60)
+    email: Optional[EmailStr] = Field(max_length=60, default=None)
+    handler: Optional[str] = Field(max_length=60, default=None)
+    bio: Optional[str] = Field(max_length=240, default=None)
+    username: Optional[str] = Field(max_length=60, default=None)
