@@ -1,3 +1,5 @@
+from enum import Enum
+
 from bson import ObjectId
 from pydantic import BaseModel, Field, EmailStr, model_validator
 from typing import Optional
@@ -28,6 +30,20 @@ class UserOut(UserIn):
         pymongo_dict = {"_id": ObjectId(self.id), **self.dict()}
         pymongo_dict.pop('id')
         return pymongo_dict
+
+
+class UserOrderByEnum(Enum):
+    email: str = "email"
+    handler: str = "handler"
+    bio: str = "bio"
+    username: str = "username"
+
+
+class UserQueryParams(BaseModel):
+    page_num: Optional[int] = Field(gt=0, default=1)
+    page_size: Optional[int] = Field(gt=0, default=10)
+    order_by: Optional[UserOrderByEnum] = Field(default=UserOrderByEnum.handler)
+    desc: Optional[bool] = Field(default=False)
 
 
 class UserUpdateQuery(BaseModel):

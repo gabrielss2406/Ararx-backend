@@ -1,12 +1,12 @@
-from typing import Optional
+from typing import Optional, Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Depends
 from starlette import status
 from starlette.exceptions import HTTPException
 
 from api.models.Message import Message
-from api.models.UsersModels import UserOut, UserUpdateQuery
-from api.services.user.read import get_user as get_user_by_handler
+from api.models.UsersModels import UserOut, UserUpdateQuery, UserQueryParams
+from api.services.user.read import get_user as get_user_by_handler, get_multiple_users
 from api.services.user.update import update_user as update_user_by_handler
 from api.services.user.delete import delete_user as delete_user_by_handler
 
@@ -16,14 +16,16 @@ router = APIRouter(
 )
 
 
-# @router.get("/")
-# def get_users(
-# page_num: Optional[int] = Query(default=None, gt=0),
-# page_size: Optional[int] = Query(default=None, gt=0),
-# order_by: Optional[UserOrderByEnum] = None,
-# desc: Optional[bool] = None
-# ) -> list[UserOut]:
-# pass
+@router.get("/")
+def get_users(params: UserQueryParams = Depends()) -> list[UserOut]:
+    try:
+        print(params)
+        result = get_multiple_users(params)
+
+        return result
+    except Exception as e:
+        raise e
+
 
 @router.get("/{user_handler}")
 def get_user(user_handler: str) -> UserOut:
