@@ -17,7 +17,7 @@ async def follow_user(
     other_user_handler: str,
     current_user: dict = Security(get_current_user),
 ) -> dict:
-    user_handler = current_user["user_handler"]
+    user_handler = current_user.handler
     result = await follow_user_service(user_handler, other_user_handler)
 
     if not result:
@@ -34,7 +34,7 @@ async def unfollow_user(
     other_user_handler: str,
     current_user: dict = Security(get_current_user),
 ) -> dict:
-    user_handler = current_user["user_handler"]
+    user_handler = current_user.handler
     result = await unfollow_user_service(user_handler, other_user_handler)
 
     if not result:
