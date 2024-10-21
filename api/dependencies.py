@@ -46,7 +46,7 @@ def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 
-def authenticate_user(username: str, password: str) -> Union[UserOut, False]:
+def authenticate_user(username: str, password: str) -> Union[UserOut, Literal[False]]:
     user: Union[UserOut, None]
 
     user = get_user(username)
