@@ -17,7 +17,6 @@ class UserOut(UserIn):
     bio: str = Field(max_length=240, default="")
     followers: list[str] = Field(default=[])
     following: list[str] = Field(default=[])
-    user_handler: str = Field(alias="handler")
 
     @model_validator(mode="before")
     def set_username(cls, values):

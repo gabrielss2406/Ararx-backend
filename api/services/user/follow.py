@@ -2,6 +2,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import HTTPException, status
 from typing import Optional
 from dotenv import load_dotenv
+from api.services.db import connect_mongo
 import os
 
 load_dotenv()
@@ -17,17 +18,21 @@ async def follow_user_service(current_user: str, other_user: str) -> Optional[bo
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Você não pode seguir a si mesmo.",
         )
+    user_key = "handler"
 
     # Verifica se o outro usuário existe
-    user = await db.users.find_one({"user_handler": other_user})
+    collection, _ = connect_mongo("Users")
+    user = collection.find_one({f"{user_key}": f"{other_user}"})
+    print(user)
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado."
         )
 
     # Adiciona o usuário à lista de seguidores se ainda não foi seguido
-    result = await db.users.update_one(
-        {"user_handler": current_user}, {"$addToSet": {"following": other_user}}
+    result = collection.update_one(
+        {"handler": current_user}, {"$addToSet": {"following": other_user}}
     )
     return result.modified_count > 0
 
@@ -40,15 +45,18 @@ async def unfollow_user_service(current_user: str, other_user: str) -> Optional[
             detail="Você não pode deixar de seguir a si mesmo.",
         )
 
+    user_key = "handler"
+
     # Verifica se o outro usuário existe
-    user = await db.users.find_one({"user_handler": other_user})
+    collection, _ = connect_mongo("Users")
+    user = collection.find_one({f"{user_key}": f"{other_user}"})
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado."
         )
 
     # Remove o usuário da lista de seguidores se ele estiver na lista
-    result = await db.users.update_one(
-        {"user_handler": current_user}, {"$pull": {"following": other_user}}
+    result = collection.update_one(
+        {"handler": current_user}, {"$pull": {"following": other_user}}
     )
     return result.modified_count > 0
