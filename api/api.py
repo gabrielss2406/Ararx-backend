@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from api.routes import test, register, login, post
+from api.routes import test, register, login, post, follow
 
 
 # Passa o gerenciador de ciclo de vida para o FastAPI
@@ -13,6 +13,7 @@ app.include_router(test.router)
 app.include_router(register.router)
 app.include_router(login.router)
 app.include_router(post.router)
+app.include_router(follow.router)
 
 
 @app.get("/")
