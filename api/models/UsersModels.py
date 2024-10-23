@@ -20,15 +20,15 @@ class UserOut(UserIn):
     followers: list[str] = Field(default=[])
     following: list[str] = Field(default=[])
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     def set_username(cls, values):
-        if values.get('username') is None:
-            values['username'] = values.get('handler')
+        if values.get("username") is None:
+            values["username"] = values.get("handler")
         return values
 
     def to_pymongo(self):
         pymongo_dict = {"_id": ObjectId(self.id), **self.dict()}
-        pymongo_dict.pop('id')
+        pymongo_dict.pop("id")
         return pymongo_dict
 
 
