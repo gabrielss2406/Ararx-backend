@@ -1,8 +1,16 @@
+from enum import Enum
+
+from bson import ObjectId
 from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
 
 from api.helpers.objectid import PydanticObjectId
+
+
+class CommentParentTypeEnum(Enum):
+    post = 'post'
+    comment = 'comment'
 
 
 class CommentIn(BaseModel):
@@ -16,11 +24,14 @@ class CommentOut(CommentIn):
     likes: list[str] = Field(default=[])
     reposts: list[str] = Field(default=[])
     comments: list['CommentOut'] = Field(default=[])
+    edited: bool = Field(default=False)
+
+    def to_pymongo(self):
+        pymongo_dict = {"_id": ObjectId(self.id), **self.dict()}
+        pymongo_dict.pop('id')
+        return pymongo_dict
 
 
 class CommentUpdateQuery(BaseModel):
-    commented_by: Optional[str] = Field(max_length=60)
-    comment: Optional[str] = Field(max_length=240)
-    likes: Optional[int] = Field(default=0)
-    id: Optional[int] = Field(default=1)
-    date: Optional[datetime] = datetime.now()
+    comment: Optional[str] = Field(default=None, max_length=240)
+    like: Optional[str] = Field(default=None)
