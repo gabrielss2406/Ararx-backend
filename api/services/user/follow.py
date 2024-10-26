@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from typing import Optional
 from api.services.db import connect_mongo
-
+import os
 
 # Função para seguir um usuário
 async def follow_user_service(current_user: str, other_user: str) -> Optional[bool]:
