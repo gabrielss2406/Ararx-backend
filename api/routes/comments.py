@@ -1,11 +1,14 @@
-from typing import Optional
+from fastapi import APIRouter, Depends
+from starlette import status
+from starlette.exceptions import HTTPException
 
-from fastapi import APIRouter
-
-from api.models.CommentModels import CommentOut, CommentUpdateQuery, CommentIn, CommentParentTypeEnum
+from api.models.CommentModels import CommentOut, CommentUpdateQuery, CommentIn, CommentParentTypeEnum, \
+    CommentQueryParams
 from api.models.Message import Message
 from api.services.comment.create import create_comment as create_comment_by_id
-
+from api.services.comment.read import get_comments as get_comments_by_query
+from api.services.comment.update import update_comment as edit_comment_by_id
+from api.services.comment.delete import delete_comment as delete_comment_by_id
 
 router = APIRouter(
     prefix='/comments',
@@ -13,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.post("/create_comment/{parent_id}")
+@router.post("/create_comment/{parent_id}", description="Creates a new comment on a post")
 def create_comment(parent_id: str, comment: CommentIn) -> Message:
     try:
         new_comment: CommentOut = create_comment_by_id(parent_id=parent_id, comment=comment)
@@ -24,40 +27,62 @@ def create_comment(parent_id: str, comment: CommentIn) -> Message:
     except Exception as e:
         raise e
 
-# @router.get("/comments")
-# def get_comments(
-# page_num: Optional[int] = Query(default=None, gt=0),
-# page_size: Optional[int] = Query(default=None, gt=0),
-# order_by: Optional[StudentOrderByEnum] = None,
-# desc: Optional[bool] = None
-# ) -> list[CommentOut]:
-# pass
-#
-# @router.get("/{post_id}")
-# def get_comments_by_post(post_id: str) -> list(CommentOut):
-#     try:
-#         result = get_comments_by_post
-#     except Exception as e:
-#         raise e
+
+@router.get("/{post_id}", description="Returns the comments of a post")
+def get_comments(post_id: str, query: CommentQueryParams = Depends()) -> list[CommentOut]:
+    try:
+        result = get_comments_by_query(post_id, query)
+        return result
+    except Exception as e:
+        raise e
 
 
-# @router.put("/{comment_id}")
-# def edit_comment(comment_id: str, new_comment: str) -> Message:
-#     try:
-#         result = edit_comment_by_id(comment_id=comment_id, new_comment=new_comment)
-#
-#         return result
-#     except Exception as e:
-#         raise e
+@router.put("/edit_comment/{comment_id}")
+def edit_comment(comment_id: str, new_comment: str) -> Message:
+    try:
+        result = edit_comment_by_id(comment_id=comment_id, query=CommentUpdateQuery(new_comment=new_comment))
 
-# @router.put("/{comment_id}")
-# def like_comment(comment_id: str, user_handler: str) -> Message:
-# pass
-#
-# @router.put("/{comment_id}")
-# def dislike_comment(comment_id: str, user_handler: str) -> Message:
-# pass
-#
-# @router.delete("/{comment_id}")
-# def delete_comment(comment_id: str) -> Message:
-# pass
+        return Message(message=f"comment with id {comment_id} updated successfully")
+    except Exception as e:
+        raise e
+
+
+@router.put("/like/{comment_id}")
+def like_comment(comment_id: str, user_handler: str) -> Message:
+    try:
+        result = edit_comment_by_id(
+            comment_id=comment_id,
+            query=CommentUpdateQuery(add_or_remove_like=user_handler))
+
+        return Message(message=f"comment with id {comment_id} liked by {user_handler} successfully")
+    except Exception as e:
+        raise e
+
+
+@router.put("/dislike/{comment_id}")
+def dislike_comment(comment_id: str, user_handler: str) -> Message:
+    try:
+        result = edit_comment_by_id(
+            comment_id=comment_id,
+            query=CommentUpdateQuery(add_or_remove_like=user_handler))
+
+        return Message(message=f"comment with id {comment_id} diliked by {user_handler} successfully")
+    except Exception as e:
+        raise e
+
+
+@router.delete("/{comment_id}")
+def delete_comment(comment_id: str) -> Message:
+    try:
+        result = delete_comment_by_id(comment_id=comment_id)
+
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"comment with id {comment_id} was not found"
+            )
+
+        return Message(message=f"comment with id {comment_id} was deleted successfully")
+
+    except Exception as e:
+        raise e

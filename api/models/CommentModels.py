@@ -15,7 +15,7 @@ class CommentParentTypeEnum(Enum):
 
 class CommentIn(BaseModel):
     commented_by: str = Field(max_length=60)
-    comment: str = Field(max_length=240)
+    content: str = Field(max_length=240)
 
 
 class CommentOut(CommentIn):
@@ -33,5 +33,19 @@ class CommentOut(CommentIn):
 
 
 class CommentUpdateQuery(BaseModel):
-    comment: Optional[str] = Field(default=None, max_length=240)
-    like: Optional[str] = Field(default=None)
+    new_comment: Optional[str] = Field(default=None, max_length=240)
+    add_or_remove_like: Optional[str] = Field(default=None)
+
+
+class CommentOrderByEnum(Enum):
+    id: str = "_id"
+    date: str = "date"
+    likes: str = "likes"
+    reposts: str = "reposts"
+
+
+class CommentQueryParams(BaseModel):
+    page_num: Optional[int] = Field(gt=0, default=1)
+    page_size: Optional[int] = Field(gt=0, default=10)
+    order_by: Optional[CommentOrderByEnum] = Field(default=CommentOrderByEnum.date)
+    desc: Optional[bool] = Field(default=False)
