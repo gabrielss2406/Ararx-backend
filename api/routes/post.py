@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Query, HTTPException, status
-from typing import List, Optional
+from typing import List
 
 from api.models.Message import Message
-from api.models.PostModels import PostOut, PostUpdateQuery, PostOrderByEnum
+from api.models.PostModels import PostOut, PostUpdateQuery
 import logging
 from api.services.post import (
     create_new_post,
@@ -10,11 +10,13 @@ from api.services.post import (
     get_post_by_id,
     update_post_by_id,
     like_post_by_id,
-    dislike_post_by_id,
     delete_post_by_id,
 )
 
-router = APIRouter(prefix="/posts", tags=["posts"])
+router = APIRouter(
+    prefix="/posts",
+    tags=["post"],
+)
 
 # Configuração básica de logging para registrar erros.
 logging.basicConfig(level=logging.ERROR)
@@ -38,7 +40,7 @@ def create_post(post_id: str, posted_by: str) -> Message:
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Post with id {post_id} already exists!",
             )
-        return Message(detail="Post created successfully.")
+        return Message(message="Post created successfully.")
     except Exception as e:
         logger.error(f"Failed to create post {post_id}: {str(e)}")
         raise HTTPException(
@@ -51,12 +53,10 @@ def create_post(post_id: str, posted_by: str) -> Message:
 def get_posts(
     page_num: int = Query(1, gt=0),
     page_size: int = Query(10, gt=0),
-    order_by: Optional[PostOrderByEnum] = None,
-    desc: bool = False,
 ) -> List[PostOut]:
     """Recupera uma lista paginada de posts."""
     try:
-        posts = get_all_posts(page_num, page_size, order_by, desc)
+        posts = get_all_posts(page_num, page_size)
         if not posts:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="No posts found."
@@ -86,14 +86,14 @@ def get_post(post_id: str) -> PostOut:
         )
 
 
-@router.put("/{post_id}", summary="Update a post")
+@router.put("/{post_id}", summary="Update a post", response_model=Message)
 def update_post(post_id: str, query: PostUpdateQuery) -> Message:
     """Atualiza um post pelo ID."""
     try:
         result = update_post_by_id(post_id, query)
         if not result:
             raise not_found_exception(post_id)
-        return Message(detail="Post updated successfully.")
+        return Message(message="Post updated successfully.")
     except Exception as e:
         logger.error(f"Failed to update post {post_id}: {str(e)}")
         raise HTTPException(
@@ -103,34 +103,18 @@ def update_post(post_id: str, query: PostUpdateQuery) -> Message:
 
 
 @router.post("/{post_id}/like", summary="Like a post")
-def like_post(post_id: str, user_handler: str) -> Message:
+def like_post(post_id: str, handler: str) -> Message:
     """Adiciona um like a um post."""
     try:
-        result = like_post_by_id(post_id, user_handler)
+        result = like_post_by_id(post_id, handler)
         if not result:
             raise not_found_exception(post_id)
-        return Message(detail="Post liked successfully.")
+        return Message(message="Post liked successfully.")
     except Exception as e:
         logger.error(f"Failed to like post {post_id}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while liking the post.",
-        )
-
-
-@router.post("/{post_id}/dislike", summary="Dislike a post")
-def dislike_post(post_id: str, user_handler: str) -> Message:
-    """Adiciona um dislike a um post."""
-    try:
-        result = dislike_post_by_id(post_id, user_handler)
-        if not result:
-            raise not_found_exception(post_id)
-        return Message(detail="Post disliked successfully.")
-    except Exception as e:
-        logger.error(f"Failed to dislike post {post_id}: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred while disliking the post.",
         )
 
 
@@ -141,7 +125,7 @@ def delete_post(post_id: str) -> Message:
         result = delete_post_by_id(post_id)
         if not result:
             raise not_found_exception(post_id)
-        return Message(detail="Post deleted successfully.")
+        return Message(message="Post deleted successfully.")
     except Exception as e:
         logger.error(f"Failed to delete post {post_id}: {str(e)}")
         raise HTTPException(
