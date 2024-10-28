@@ -1,15 +1,7 @@
-from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import HTTPException, status
 from typing import Optional
-from dotenv import load_dotenv
 from api.services.db import connect_mongo
 import os
-
-load_dotenv()
-MONGO_URI = os.getenv("MONGO_URI")
-client = AsyncIOMotorClient(MONGO_URI)
-db = client.get_database("ararx")
-
 
 # Função para seguir um usuário
 async def follow_user_service(current_user: str, other_user: str) -> Optional[bool]:

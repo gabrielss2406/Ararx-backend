@@ -7,7 +7,7 @@ from api.models.UsersModels import UserUpdateQuery
 from api.services.db import connect_mongo
 
 
-def update_user(user_handler: str, query: UserUpdateQuery) -> Union[True, False]:
+def update_user(user_handler: str, query: UserUpdateQuery):
     try:
 
         collection, _ = connect_mongo('Users')

@@ -10,9 +10,6 @@ from api.services.db import connect_mongo
 
 
 def create_user(user: UserIn) -> Union[UserOut, None]:
-    if mongo.db is None:
-        raise Exception("MongoDB connection not established.")
-
     collection, _ = connect_mongo('Users')
     user.password = get_password_hash(user.password)
 
