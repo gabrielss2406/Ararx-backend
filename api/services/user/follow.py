@@ -1,6 +1,5 @@
 from fastapi import HTTPException, status
 from typing import Optional
-from dotenv import load_dotenv
 from api.services.db import connect_mongo
 import os
 
