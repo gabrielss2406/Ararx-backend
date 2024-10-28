@@ -7,7 +7,7 @@ from api.helpers.objectid import PydanticObjectId
 
 class CommentIn(BaseModel):
     commented_by: str = Field(max_length=60)
-    comment: str = Field(max_length=240)
+    comment: Optional[str] = None
 
 
 class CommentOut(CommentIn):
@@ -15,7 +15,7 @@ class CommentOut(CommentIn):
     date: datetime = datetime.now()
     likes: list[str] = Field(default=[])
     reposts: list[str] = Field(default=[])
-    comments: list['CommentOut'] = Field(default=[])
+    comments: list["CommentOut"] = Field(default=[])
 
 
 class CommentUpdateQuery(BaseModel):

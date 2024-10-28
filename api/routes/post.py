@@ -11,6 +11,8 @@ from api.services.post import (
     update_post_by_id,
     like_post_by_id,
     delete_post_by_id,
+    dislike_post_by_id,
+    get_posts_by_author,
 )
 
 router = APIRouter(
@@ -31,18 +33,18 @@ def not_found_exception(post_id: str) -> HTTPException:
 
 
 @router.post("/", summary="Create a new post")
-def create_post(post_id: str, posted_by: str) -> Message:
-    """Cria um novo post com um ID único."""
+def create_post(posted_by: str) -> Message:
+    """Cria um novo post com um ID único gerado automaticamente."""
     try:
-        result = create_new_post(post_id, posted_by)
+        result = create_new_post(posted_by)
         if not result:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"Post with id {post_id} already exists!",
+                detail=f"Failed to create post.",
             )
         return Message(message="Post created successfully.")
     except Exception as e:
-        logger.error(f"Failed to create post {post_id}: {str(e)}")
+        logger.error(f"Failed to create post: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while creating the post.",
@@ -86,6 +88,27 @@ def get_post(post_id: str) -> PostOut:
         )
 
 
+@router.get("/author/{author}", summary="Get all posts by a specific author")
+def get_posts_by_author_route(
+    author: str, page_num: int = Query(1, gt=0), page_size: int = Query(10, gt=0)
+) -> List[PostOut]:
+    """Recupera todos os posts de um autor específico."""
+    try:
+        posts = get_posts_by_author(author, page_num, page_size)
+        if not posts:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No posts found for author {author}.",
+            )
+        return posts
+    except Exception as e:
+        logger.error(f"Failed to retrieve posts for author {author}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while retrieving posts.",
+        )
+
+
 @router.put("/{post_id}", summary="Update a post", response_model=Message)
 def update_post(post_id: str, query: PostUpdateQuery) -> Message:
     """Atualiza um post pelo ID."""
@@ -115,6 +138,22 @@ def like_post(post_id: str, handler: str) -> Message:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while liking the post.",
+        )
+
+
+@router.post("/{post_id}/dislike", summary="Dislike a post")
+def dislike_post(post_id: str, handler: str) -> Message:
+    """Remove um like de um post."""
+    try:
+        result = dislike_post_by_id(post_id, handler)
+        if not result:
+            raise not_found_exception(post_id)
+        return Message(message="Post disliked successfully.")
+    except Exception as e:
+        logger.error(f"Failed to dislike post {post_id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while disliking the post.",
         )
 
 
