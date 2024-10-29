@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Query, HTTPException, status
+from fastapi import APIRouter, Query, HTTPException, status, Depends
 from typing import List
 
 from api.models.Message import Message
-from api.models.PostModels import PostOut, PostUpdateQuery
+from api.models.PostModels import PostOut, PostUpdateQuery, PostIn
 import logging
 from api.services.post import (
     create_new_post,
@@ -14,6 +14,10 @@ from api.services.post import (
     dislike_post_by_id,
     get_posts_by_author,
 )
+from api.dependencies import get_current_user  # Importe a função para obter o usuário
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # Define o URL do token
 
 router = APIRouter(
     prefix="/posts",
@@ -33,14 +37,18 @@ def not_found_exception(post_id: str) -> HTTPException:
 
 
 @router.post("/", summary="Create a new post")
-def create_post(posted_by: str) -> Message:
-    """Cria um novo post com um ID único gerado automaticamente."""
+def create_post(post: PostIn, token: str = Depends(oauth2_scheme)) -> Message:
+    """Cria um novo post, usando o token de autenticação para identificar o usuário."""
     try:
-        result = create_new_post(posted_by)
+        user = get_current_user(token)  # Obtém o usuário a partir do token
+        posted_by = (
+            user.handler
+        )  # Ou use user.id, dependendo do que você quer armazenar
+        result = create_new_post(posted_by, post.content)  # Passa o conteúdo do post
         if not result:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"Failed to create post.",
+                detail="Failed to create post.",
             )
         return Message(message="Post created successfully.")
     except Exception as e:
@@ -110,10 +118,12 @@ def get_posts_by_author_route(
 
 
 @router.put("/{post_id}", summary="Update a post", response_model=Message)
-def update_post(post_id: str, query: PostUpdateQuery) -> Message:
+def update_post(
+    post_id: str, query: PostUpdateQuery, user: str = Depends(get_current_user)
+) -> Message:
     """Atualiza um post pelo ID."""
     try:
-        result = update_post_by_id(post_id, query)
+        result = update_post_by_id(post_id, query, user)  # Passa o usuário autenticado
         if not result:
             raise not_found_exception(post_id)
         return Message(message="Post updated successfully.")
@@ -126,10 +136,13 @@ def update_post(post_id: str, query: PostUpdateQuery) -> Message:
 
 
 @router.post("/{post_id}/like", summary="Like a post")
-def like_post(post_id: str, handler: str) -> Message:
+def like_post(
+    post_id: str, handler: str, token: str = Depends(oauth2_scheme)
+) -> Message:
     """Adiciona um like a um post."""
     try:
-        result = like_post_by_id(post_id, handler)
+        posted_by = get_current_user(token)  # Obtém o usuário a partir do token
+        result = like_post_by_id(post_id, posted_by)  # Passa o usuário que deu o like
         if not result:
             raise not_found_exception(post_id)
         return Message(message="Post liked successfully.")
@@ -142,10 +155,15 @@ def like_post(post_id: str, handler: str) -> Message:
 
 
 @router.post("/{post_id}/dislike", summary="Dislike a post")
-def dislike_post(post_id: str, handler: str) -> Message:
+def dislike_post(
+    post_id: str, handler: str, token: str = Depends(oauth2_scheme)
+) -> Message:
     """Remove um like de um post."""
     try:
-        result = dislike_post_by_id(post_id, handler)
+        posted_by = get_current_user(token)  # Obtém o usuário a partir do token
+        result = dislike_post_by_id(
+            post_id, posted_by
+        )  # Passa o usuário que deu o dislike
         if not result:
             raise not_found_exception(post_id)
         return Message(message="Post disliked successfully.")
@@ -158,10 +176,13 @@ def dislike_post(post_id: str, handler: str) -> Message:
 
 
 @router.delete("/{post_id}", summary="Delete a post")
-def delete_post(post_id: str) -> Message:
+def delete_post(post_id: str, token: str = Depends(oauth2_scheme)) -> Message:
     """Exclui um post pelo ID."""
     try:
-        result = delete_post_by_id(post_id)
+        posted_by = get_current_user(token)  # Obtém o usuário a partir do token
+        result = delete_post_by_id(
+            post_id
+        )  # A lógica de autorização pode ser adicionada aqui
         if not result:
             raise not_found_exception(post_id)
         return Message(message="Post deleted successfully.")
