@@ -9,7 +9,6 @@ from api.models.CommentModels import CommentOut
 
 class PostIn(BaseModel):
     content: str = Field(max_length=240)
-    author: str = Field(max_length=60)
 
 
 class PostOut(PostIn):
