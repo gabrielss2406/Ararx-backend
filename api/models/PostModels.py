@@ -9,7 +9,6 @@ from api.models.CommentModels import CommentOut
 
 class PostIn(BaseModel):
     content: str = Field(max_length=240)
-    author: Optional[str] = Field(max_length=60)
 
 
 class PostOut(PostIn):
@@ -18,8 +17,10 @@ class PostOut(PostIn):
         default_factory=datetime.now
     )  # Usa o default_factory para a data
     likes: List[str] = []  # Array de handlers que curtiram
+    isLiked: List[bool] = None  # Se o usuário atual curtiu ou não
     reposts: List[str] = []  # Array de handlers que repostaram
     comments: List[CommentOut] = []  # Array de comentários
+    author: Optional[str] = Field(max_length=60)
 
 
 class PostUpdateQuery(BaseModel):
