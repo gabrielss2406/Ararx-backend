@@ -1,85 +1,106 @@
 from typing import Optional, List
-
-from api.helpers.mongo_instance import mongo
 from api.models.PostModels import PostOut, PostUpdateQuery
 from datetime import datetime
+from api.services.db.mongo_connection import connect_mongo
+from bson import ObjectId
 
 
-def create_new_post(post_id: str, posted_by: str) -> bool:
-    """Cria uma nova postagem."""
-    posts_collection = mongo.get_collection("Posts")
-    existing_post = posts_collection.find_one({"_id": post_id})
-    if existing_post:
-        return False  # Postagem já existe
+def create_new_post(posted_by: str, content: str) -> bool:
+    """Cria uma nova postagem com um ID gerado automaticamente. Retorna True se a postagem foi criada com sucesso, False se já existe."""
+    collection, _ = connect_mongo("Posts")
+    post_id = ObjectId()  # Gerar um novo ObjectId automaticamente
 
     post_data = {
         "_id": post_id,
-        "posted_by": posted_by,
-        "likes": 0,
-        "dislikes": 0,
-        "created_at": datetime.now(datetime.timezone.utc),
-        "updated_at": datetime.now(datetime.timezone.utc),
+        "author": posted_by,  # Certifique-se de que 'posted_by' é uma string
+        "content": content,
+        "date": str(datetime.now()),
+        "likes": [],
+        "reposts": [],
+        "comments": [],
     }
-    posts_collection.insert_one(post_data)
+    collection.insert_one(post_data)
     return True
 
 
-def get_all_posts(
-    page_num: int, page_size: int, order_by: Optional[str] = None, desc: bool = False
-) -> List[PostOut]:
-    """Recupera uma lista de postagens com paginação e ordenação."""
-    posts_collection = mongo.get_collection("Posts")
+def get_all_posts(page_num: int = 1, page_size: int = 10) -> List[PostOut]:
+    """Recupera uma lista de postagens com paginação. Retorna uma lista de PostOut."""
+    collection, _ = connect_mongo("Posts")
     skip = (page_num - 1) * page_size
-    order = -1 if desc else 1
-    cursor = posts_collection.find().skip(skip).limit(page_size)
-
-    if order_by:
-        cursor = cursor.sort(order_by, order)
+    cursor = (
+        collection.find().sort("date", -1).skip(skip).limit(page_size)
+    )  # Ordena do mais novo para o mais velho
 
     posts = cursor.to_list(length=page_size)
     return [PostOut(**post) for post in posts]
 
 
 def get_post_by_id(post_id: str) -> Optional[PostOut]:
-    """Recupera uma postagem específica pelo ID."""
-    posts_collection = mongo.get_collection("Posts")
-    post = posts_collection.find_one({"_id": post_id})
+    """Recupera uma postagem específica pelo ID. Retorna PostOut ou None se não encontrado."""
+    collection, _ = connect_mongo("Posts")
+    post = collection.find_one({"_id": ObjectId(post_id)})
     if post:
         return PostOut(**post)
     return None
 
 
-def update_post_by_id(post_id: str, query: PostUpdateQuery) -> bool:
-    """Atualiza uma postagem específica."""
-    posts_collection = mongo.get_collection("Posts")
-    result = posts_collection.update_one(
-        {"_id": post_id}, {"$set": query.dict(exclude_unset=True)}
+def get_posts_by_author(
+    author: str, page_num: int = 1, page_size: int = 10
+) -> List[PostOut]:
+    """Recupera todos os posts de um autor específico com paginação. Retorna uma lista de PostOut."""
+    collection, _ = connect_mongo("Posts")
+    skip = (page_num - 1) * page_size
+    cursor = (
+        collection.find({"author": author}).sort("date", -1).skip(skip).limit(page_size)
+    )  # Ordena do mais novo para o mais velho
+
+    posts = cursor.to_list(length=page_size)
+    return [PostOut(**post) for post in posts]
+
+
+def update_post_by_id(post_id: str, query: PostUpdateQuery, user: str) -> bool:
+    """Atualiza uma postagem específica. Retorna True se a postagem foi atualizada, False se não encontrada ou se o usuário não é o autor."""
+    collection, _ = connect_mongo("Posts")
+    post = collection.find_one({"_id": ObjectId(post_id)})
+    if post and post["author"] == user:  # Verifica se o usuário é o autor do post
+        result = collection.update_one(
+            {"_id": ObjectId(post_id)}, {"$set": query.dict(exclude_unset=True)}
+        )
+        return result.modified_count > 0
+    return False
+
+
+def like_post_by_id(post_id: str, user: str) -> bool:
+    """Adiciona um like à postagem. Retorna True se o like foi adicionado, False se não encontrada."""
+    collection, _ = connect_mongo("Posts")
+    result = collection.update_one(
+        {"_id": ObjectId(post_id)},
+        {
+            "$addToSet": {"likes": user},  # Usa $addToSet para evitar duplicatas
+            "$set": {"date": datetime.now()},
+        },
     )
     return result.modified_count > 0
 
 
-def like_post_by_id(post_id: str, user_handler: str) -> bool:
-    """Adiciona um like à postagem."""
-    posts_collection = mongo.get_collection("Posts")
-    result = posts_collection.update_one(
-        {"_id": post_id},
-        {"$inc": {"likes": 1}, "$set": {"updated_at": datetime.utcnow()}},
+def dislike_post_by_id(post_id: str, user: str) -> bool:
+    """Remove um like da postagem. Retorna True se o dislike foi aplicado, False se não encontrada."""
+    collection, _ = connect_mongo("Posts")
+    result = collection.update_one(
+        {"_id": ObjectId(post_id)},
+        {
+            "$pull": {"likes": user},  # Usa $pull para remover o like
+            "$set": {"date": datetime.now()},
+        },
     )
     return result.modified_count > 0
 
 
-def dislike_post_by_id(post_id: str, user_handler: str) -> bool:
-    """Adiciona um dislike à postagem."""
-    posts_collection = mongo.get_collection("Posts")
-    result = posts_collection.update_one(
-        {"_id": post_id},
-        {"$inc": {"dislikes": 1}, "$set": {"updated_at": datetime.utcnow()}},
-    )
-    return result.modified_count > 0
-
-
-def delete_post_by_id(post_id: str) -> bool:
-    """Exclui uma postagem pelo ID."""
-    posts_collection = mongo.get_collection("Posts")
-    result = posts_collection.delete_one({"_id": post_id})
-    return result.deleted_count > 0
+def delete_post_by_id(post_id: str, user: str) -> bool:
+    """Exclui uma postagem pelo ID. Retorna True se a postagem foi excluída, False se não encontrada ou se o usuário não é o autor."""
+    collection, _ = connect_mongo("Posts")
+    post = collection.find_one({"_id": ObjectId(post_id)})
+    if post and post["author"] == user:  # Verifica se o usuário é o autor do post
+        result = collection.delete_one({"_id": ObjectId(post_id)})
+        return result.deleted_count > 0
+    return False

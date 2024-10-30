@@ -1,6 +1,5 @@
 import os
 from datetime import timedelta
-from typing import Dict
 
 from dotenv import load_dotenv
 from fastapi import APIRouter
@@ -12,10 +11,7 @@ from api.models.UsersModels import UserIn
 from api.models.structural.TokenModels import Token
 from api.services.user.create import create_user
 
-router = APIRouter(
-    prefix="/register",
-    tags=["register"]
-)
+router = APIRouter(prefix="/register", tags=["register"])
 
 load_dotenv()
 
@@ -30,7 +26,7 @@ def register_student(user: UserIn) -> Token:
         if not result:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"User with email {user.email} or handler {user.handler} already exists!"
+                detail=f"User with email {user.email} or handler {user.handler} already exists!",
             )
 
         user = result

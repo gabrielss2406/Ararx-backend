@@ -1,6 +1,6 @@
 import os
 from datetime import timezone, datetime, timedelta
-from typing import Annotated, Union
+from typing import Annotated, Union, Literal
 import jwt
 from fastapi import Security, Depends
 from passlib.context import CryptContext
@@ -46,7 +46,7 @@ def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 
-def authenticate_user(username: str, password: str) -> Union[UserOut, False]:
+def authenticate_user(username: str, password: str) -> Union[UserOut, Literal[False]]:
     user: Union[UserOut, None]
 
     user = get_user(username)
