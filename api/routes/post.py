@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query, HTTPException, status, Depends
 from typing import List
-
+from api.dependencies import get_current_user
 from api.models.Message import Message
 from api.models.PostModels import PostOut, PostUpdateQuery, PostIn
 import logging
@@ -136,13 +136,13 @@ def update_post(
 
 
 @router.post("/{post_id}/like", summary="Like a post")
-def like_post(
-    post_id: str, handler: str, token: str = Depends(oauth2_scheme)
-) -> Message:
+def like_post(post_id: str, token: str = Depends(oauth2_scheme)) -> Message:
     """Adiciona um like a um post."""
     try:
         posted_by = get_current_user(token)  # Obtém o usuário a partir do token
-        result = like_post_by_id(post_id, posted_by)  # Passa o usuário que deu o like
+        result = like_post_by_id(
+            post_id, posted_by.handler
+        )  # Passa o usuário que deu o like
         if not result:
             raise not_found_exception(post_id)
         return Message(message="Post liked successfully.")
@@ -155,14 +155,12 @@ def like_post(
 
 
 @router.post("/{post_id}/dislike", summary="Dislike a post")
-def dislike_post(
-    post_id: str, handler: str, token: str = Depends(oauth2_scheme)
-) -> Message:
+def dislike_post(post_id: str, token: str = Depends(oauth2_scheme)) -> Message:
     """Remove um like de um post."""
     try:
         posted_by = get_current_user(token)  # Obtém o usuário a partir do token
         result = dislike_post_by_id(
-            post_id, posted_by
+            post_id, posted_by.handler
         )  # Passa o usuário que deu o dislike
         if not result:
             raise not_found_exception(post_id)
@@ -181,7 +179,7 @@ def delete_post(post_id: str, token: str = Depends(oauth2_scheme)) -> Message:
     try:
         posted_by = get_current_user(token)  # Obtém o usuário a partir do token
         result = delete_post_by_id(
-            post_id
+            post_id, posted_by.handler
         )  # A lógica de autorização pode ser adicionada aqui
         if not result:
             raise not_found_exception(post_id)
