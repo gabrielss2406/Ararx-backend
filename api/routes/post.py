@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query, HTTPException, status, Depends
 from typing import List
-
+from api.dependencies import get_current_user
 from api.models.Message import Message
 from api.models.PostModels import PostOut, PostUpdateQuery, PostIn
 import logging
