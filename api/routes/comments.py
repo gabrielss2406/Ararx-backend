@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.post("/create_comment/{parent_id}", description="Creates a new comment on a post")
+@router.post("/create/{parent_id}", description="Creates a new comment on a post")
 def create_comment(parent_id: str, comment: CommentIn) -> Message:
     try:
         new_comment: CommentOut = create_comment_by_id(parent_id=parent_id, comment=comment)
@@ -37,7 +37,7 @@ def get_comments(post_id: str, query: CommentQueryParams = Depends()) -> list[Co
         raise e
 
 
-@router.put("/edit_comment/{comment_id}")
+@router.put("/edit/{comment_id}")
 def edit_comment(comment_id: str, new_comment: str) -> Message:
     try:
         result = edit_comment_by_id(comment_id=comment_id, query=CommentUpdateQuery(new_comment=new_comment))
@@ -71,7 +71,7 @@ def dislike_comment(comment_id: str, user_handler: str) -> Message:
         raise e
 
 
-@router.delete("/{comment_id}")
+@router.delete("/delete/{comment_id}")
 def delete_comment(comment_id: str) -> Message:
     try:
         result = delete_comment_by_id(comment_id=comment_id)
