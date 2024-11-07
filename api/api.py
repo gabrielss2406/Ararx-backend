@@ -1,13 +1,12 @@
-
-from api.helpers.mongo_instance import mongo
-from contextlib import asynccontextmanager
+from api.dependencies import get_api_key
 from fastapi.middleware.cors import CORSMiddleware
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Security
 from api.routes import test, register, login, post, comments, user, follow
 
-# Passa o gerenciador de ciclo de vida para o FastAPI
-app = FastAPI()
+app = FastAPI(
+    dependencies=[Security(get_api_key)]
+)
 
 app.add_middleware(
     CORSMiddleware,

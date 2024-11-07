@@ -1,10 +1,14 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 from starlette import status
 from starlette.exceptions import HTTPException
 
+from api.dependencies import get_current_user
 from api.models.CommentModels import CommentOut, CommentUpdateQuery, CommentIn, CommentParentTypeEnum, \
     CommentQueryParams
 from api.models.Message import Message
+from api.models.UsersModels import UserOut
 from api.services.comment.create import create_comment as create_comment_by_id
 from api.services.comment.read import get_comments as get_comments_by_query
 from api.services.comment.update import update_comment as edit_comment_by_id
@@ -16,10 +20,13 @@ router = APIRouter(
 )
 
 
-@router.post("/create_comment/{parent_id}", description="Creates a new comment on a post")
-def create_comment(parent_id: str, comment: CommentIn) -> Message:
+@router.post("/create/{parent_id}", description="Creates a new comment on a post")
+def create_comment(
+        parent_id: str, comment: CommentIn,
+        current_user: Annotated[UserOut, Depends(get_current_user)]
+) -> Message:
     try:
-        new_comment: CommentOut = create_comment_by_id(parent_id=parent_id, comment=comment)
+        new_comment: CommentOut = create_comment_by_id(parent_id=parent_id, comment=comment, current_user=current_user)
 
         if new_comment:
             return Message(message=f'comment with id {new_comment.id} created successfully',
@@ -37,7 +44,7 @@ def get_comments(post_id: str, query: CommentQueryParams = Depends()) -> list[Co
         raise e
 
 
-@router.put("/edit_comment/{comment_id}")
+@router.put("/edit/{comment_id}")
 def edit_comment(comment_id: str, new_comment: str) -> Message:
     try:
         result = edit_comment_by_id(comment_id=comment_id, query=CommentUpdateQuery(new_comment=new_comment))
@@ -71,7 +78,7 @@ def dislike_comment(comment_id: str, user_handler: str) -> Message:
         raise e
 
 
-@router.delete("/{comment_id}")
+@router.delete("/delete/{comment_id}")
 def delete_comment(comment_id: str) -> Message:
     try:
         result = delete_comment_by_id(comment_id=comment_id)

@@ -14,13 +14,12 @@ class CommentParentTypeEnum(Enum):
 
 
 class CommentIn(BaseModel):
-    commented_by: str = Field(max_length=60)
     content: str = Field(max_length=240)
-
 
 
 class CommentOut(CommentIn):
     id: PydanticObjectId = Field(alias="_id", default=PydanticObjectId())
+    commented_by: str = Field(max_length=60)
     date: datetime = datetime.now()
     likes: list[str] = Field(default=[])
     reposts: list[str] = Field(default=[])
