@@ -18,7 +18,6 @@ class CommentIn(BaseModel):
     content: str = Field(max_length=240)
 
 
-
 class CommentOut(CommentIn):
     id: PydanticObjectId = Field(alias="_id", default=PydanticObjectId())
     date: datetime = datetime.now()

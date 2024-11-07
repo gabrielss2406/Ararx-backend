@@ -1,9 +1,10 @@
-from typing import Optional, Annotated
+from typing import Annotated
 
-from fastapi import APIRouter, Query, Depends
+from fastapi import APIRouter, Depends
 from starlette import status
 from starlette.exceptions import HTTPException
 
+from api.dependencies import get_current_user
 from api.models.Message import Message
 from api.models.UsersModels import UserOut, UserUpdateQuery, UserQueryParams
 from api.services.user.read import get_user as get_user_by_handler, get_multiple_users
@@ -28,7 +29,7 @@ def get_users(params: UserQueryParams = Depends()) -> list[UserOut]:
 
 
 @router.get("/{user_handler}")
-def get_user(user_handler: str) -> UserOut:
+def get_user(user_handler: str, current_user: Annotated[UserOut, Depends(get_current_user)]) -> UserOut:
     try:
         result = get_user_by_handler(user_handler)
 
@@ -37,6 +38,13 @@ def get_user(user_handler: str) -> UserOut:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f'user with handler {user_handler} was not found'
             )
+
+        if result.id in current_user.followers:
+            result.isFollowing = True
+
+        if result.id == current_user.id:
+            result.isMe = True
+
         return result
     except Exception as e:
         raise e
