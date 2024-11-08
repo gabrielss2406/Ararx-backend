@@ -19,7 +19,7 @@ class CommentIn(BaseModel):
 
 class CommentOut(CommentIn):
     id: PydanticObjectId = Field(alias="_id", default=PydanticObjectId())
-    commented_by: PydanticObjectId = Field(max_length=60)
+    commented_by: str = Field(max_length=60)
     date: datetime = datetime.now()
     likes: list[str] = Field(default=[])
     reposts: list[str] = Field(default=[])
