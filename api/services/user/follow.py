@@ -3,6 +3,7 @@ from typing import Optional
 from api.services.db import connect_mongo
 import os
 
+
 # Função para seguir um usuário
 async def follow_user_service(current_user: str, other_user: str) -> Optional[bool]:
     if current_user == other_user:
@@ -25,6 +26,9 @@ async def follow_user_service(current_user: str, other_user: str) -> Optional[bo
     # Adiciona o usuário à lista de seguidores se ainda não foi seguido
     result = collection.update_one(
         {"handler": current_user}, {"$addToSet": {"following": other_user}}
+    )
+    result2 = collection.update_one(
+        {"handler": other_user}, {"$addToSet": {"followers": current_user}}
     )
     return result.modified_count > 0
 

@@ -9,8 +9,8 @@ from api.helpers.objectid import PydanticObjectId
 
 
 class CommentParentTypeEnum(Enum):
-    post = 'post'
-    comment = 'comment'
+    post = "post"
+    comment = "comment"
 
 
 class CommentIn(BaseModel):
@@ -23,12 +23,12 @@ class CommentOut(CommentIn):
     date: datetime = datetime.now()
     likes: list[str] = Field(default=[])
     reposts: list[str] = Field(default=[])
-    comments: list['CommentOut'] = Field(default=[])
+    comments: list["CommentOut"] = Field(default=[])
     edited: bool = Field(default=False)
 
     def to_pymongo(self):
         pymongo_dict = {"_id": ObjectId(self.id), **self.dict()}
-        pymongo_dict.pop('id')
+        pymongo_dict.pop("id")
         return pymongo_dict
 
 
