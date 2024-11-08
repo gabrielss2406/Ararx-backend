@@ -22,7 +22,8 @@ router = APIRouter(
 
 @router.post("/create/{parent_id}", description="Creates a new comment on a post")
 def create_comment(
-        parent_id: str, comment: CommentIn,
+        parent_id: str,
+        comment: CommentIn,
         current_user: Annotated[UserOut, Depends(get_current_user)]
 ) -> Message:
     try:
