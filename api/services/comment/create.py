@@ -10,7 +10,7 @@ def create_comment(parent_id: str, comment: CommentIn, current_user: UserOut) ->
     try:
         collection, _ = connect_mongo('Posts')
 
-        comment: CommentOut = CommentOut(**comment.dict(), commented_by=current_user.id)
+        comment: CommentOut = CommentOut(**comment.dict(), commented_by=current_user.handler)
 
         result = collection.update_one({"_id": ObjectId(parent_id)},
                                        {"$push": {"comments": comment.to_pymongo()}})
