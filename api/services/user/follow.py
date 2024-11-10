@@ -53,6 +53,6 @@ async def unfollow_user_service(current_user: str, other_user: str) -> Optional[
 
     # Remove o usuário da lista de seguidores se ele estiver na lista
     result = collection.update_one(
-        {"handler": current_user}, {"$pull": {"following": other_user}}
+        {user_key: other_user}, {"$pull": {"followers": current_user}}
     )
     return result.modified_count > 0
