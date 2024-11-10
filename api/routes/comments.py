@@ -56,25 +56,31 @@ def edit_comment(comment_id: str, new_comment: str) -> Message:
 
 
 @router.put("/like/{comment_id}")
-def like_comment(comment_id: str, user_handler: str) -> Message:
+def like_comment(
+        comment_id: str,
+        current_user: Annotated[UserOut, Depends(get_current_user)]
+) -> Message:
     try:
         result = edit_comment_by_id(
             comment_id=comment_id,
-            query=CommentUpdateQuery(add_or_remove_like=user_handler))
+            query=CommentUpdateQuery(add_or_remove_like=current_user.handler))
 
-        return Message(message=f"comment with id {comment_id} liked by {user_handler} successfully")
+        return Message(message=f"comment with id {comment_id} liked by {current_user.handler} successfully")
     except Exception as e:
         raise e
 
 
 @router.put("/dislike/{comment_id}")
-def dislike_comment(comment_id: str, user_handler: str) -> Message:
+def dislike_comment(
+        comment_id: str,
+        current_user: Annotated[UserOut, Depends(get_current_user)]
+) -> Message:
     try:
         result = edit_comment_by_id(
             comment_id=comment_id,
-            query=CommentUpdateQuery(add_or_remove_like=user_handler))
+            query=CommentUpdateQuery(add_or_remove_like=current_user.handler))
 
-        return Message(message=f"comment with id {comment_id} diliked by {user_handler} successfully")
+        return Message(message=f"comment with id {comment_id} diliked by {current_user.handler} successfully")
     except Exception as e:
         raise e
 
