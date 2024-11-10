@@ -39,7 +39,7 @@ def get_user(user_handler: str, current_user: Annotated[UserOut, Depends(get_cur
                 detail=f'user with handler {user_handler} was not found'
             )
 
-        if result.handler in current_user.followers:
+        if result.handler in current_user.following:
             result.isFollowing = True
 
         if result.id == current_user.id:
