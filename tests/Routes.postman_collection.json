@@ -32,7 +32,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"handler\": \"postman test\",\r\n  \"password\": \"123456\",\r\n  \"email\": \"test@example.com\"\r\n}",
+							"raw": "{\r\n  \"handler\": \"testando register\",\r\n  \"password\": \"123456\",\r\n  \"email\": \"testandoregister@example.com\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -43,6 +43,13 @@
 							"raw": "{{base_url}}register",
 							"host": [
 								"{{base_url}}register"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": null,
+									"disabled": true
+								}
 							]
 						}
 					},
@@ -66,8 +73,24 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -91,28 +114,68 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "test",
-			"item": [
+				},
 				{
-					"name": "test",
+					"name": "register test",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
+									"// Test for response status code\r",
 									"pm.test(\"Response status code is 200\", function () {\r",
-									"  pm.expect(pm.response.to.have.status(200));\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Test for the presence of registration ID in the response body\r",
+									"pm.test(\"Response body contains a registration ID from the server\", function () {\r",
+									"  var responseBody = pm.response.json();\r",
+									"  pm.expect(responseBody).to.have.property('registration_id');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify that the response body contains all the required fields\", function () {\r",
+									"  var requiredFields = [\"username\", \"email\", \"registration_id\"];\r",
+									"  requiredFields.forEach(function(field) {\r",
+									"    pm.expect(responseBody).to.have.property(field);\r",
+									"  });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response content type is text/xml\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/xml\");\r",
 									"});\r",
 									"\r",
 									"\r",
-									"pm.test(\"Response time is less than 500ms\", function () {\r",
-									"  pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"pm.test(\"Token returned is in a valid format\", function () {\r",
+									"    const responseData = xml2Json(pm.response.text());\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.token).to.exist.and.to.match(/[A-Za-z0-9]{32}/, \"Token format is invalid\");\r",
 									"});\r",
 									"\r",
+									"\r",
+									"pm.test(\"Response body has the required fields - username, email, registration_id\", function () {\r",
+									"    const responseData = xml2Json(pm.response.text());\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('username');\r",
+									"    pm.expect(responseData).to.have.property('email');\r",
+									"    pm.expect(responseData).to.have.property('registration_id');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response body contains the user's email address\", function () {\r",
+									"    const responseData = xml2Json(pm.response.text());\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.email).to.exist;\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Verify the structure of the response body\", function () {\r",
+									"    const responseData = xml2Json(pm.response.text());\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"});\r",
 									"\r",
 									""
 								],
@@ -135,12 +198,184 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}test/bbbb",
+							"raw": "{{base_url}}register",
 							"host": [
-								"{{base_url}}test"
+								"{{base_url}}register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test to validate the username and password\r",
+									"pm.test(\"Username is 'test' and password is '123456'\", function() {\r",
+									"    var responseData = pm.response.json();\r",
+									"    pm.expect(responseData.username).to.equal('test');\r",
+									"    pm.expect(responseData.password).to.equal('123456');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Validate the response data type is JSON\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Verify the response data has the required fields\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('requiredField1');\r",
+									"    pm.expect(responseData).to.have.property('requiredField2');\r",
+									"    pm.expect(responseData).to.have.property('requiredField3');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Username and password are non-empty strings\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"\r",
+									"  pm.expect(responseData.username).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Username should not be empty\");\r",
+									"  pm.expect(responseData.password).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Password should not be empty\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response data contains expected keys and values\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('key1');\r",
+									"    pm.expect(responseData.key1).to.exist;\r",
+									"\r",
+									"    pm.expect(responseData).to.have.property('key2');\r",
+									"    pm.expect(responseData.key2).to.exist;\r",
+									"\r",
+									"    pm.expect(responseData).to.have.property('key3');\r",
+									"    pm.expect(responseData.key3).to.exist;\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}login",
+							"host": [
+								"{{base_url}}login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Test Posts",
+			"item": [
+				{
+					"name": "test get posts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type header is text/xml\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/xml\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response body is not null\", function () {\r",
+									"    const responseData = xml2Json(pm.response.text());\r",
+									"\r",
+									"    pm.expect(responseData).to.not.be.null;\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Validate the XML schema of the response\", function () {\r",
+									"    const responseData = xml2Json(pm.response.text());\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields and attributes\", function () {\r",
+									"    const responseData = xml2Json(pm.response.text());\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.include.all.keys('id', 'title', 'body');\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}posts/",
+							"host": [
+								"{{base_url}}posts"
 							],
 							"path": [
-								"bbbb"
+								""
 							],
 							"query": [
 								{
@@ -149,7 +384,1097 @@
 									"disabled": true
 								}
 							]
-							
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test get post by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Post content\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"dias de luta, dias de gloria\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Post id\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"67212aff9b964033067338b2\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Post author\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"test\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}posts/67212aff9b964033067338b2",
+							"host": [
+								"{{base_url}}posts"
+							],
+							"path": [
+								"67212aff9b964033067338b2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test update post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}posts/671fcbe0c4f2eed0bb8aec20",
+							"host": [
+								"{{base_url}}posts"
+							],
+							"path": [
+								"671fcbe0c4f2eed0bb8aec20"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Follow",
+			"item": [
+				{
+					"name": "follow_user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}follow/users/:other_user_handler",
+							"host": [
+								"{{base_url}}follow"
+							],
+							"path": [
+								"users",
+								":other_user_handler"
+							],
+							"variable": [
+								{
+									"key": "other_user_handler",
+									"value": "cccc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "follow_user test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have the correct schema\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('username');\r",
+									"    pm.expect(responseData.username).to.be.a('string');\r",
+									"\r",
+									"    pm.expect(responseData).to.have.property('followers');\r",
+									"    pm.expect(responseData.followers).to.be.an('array');\r",
+									"\r",
+									"    responseData.followers.forEach(function(follower) {\r",
+									"        pm.expect(follower).to.be.an('object');\r",
+									"        pm.expect(follower).to.have.property('id');\r",
+									"        pm.expect(follower.id).to.be.a('number');\r",
+									"        pm.expect(follower).to.have.property('username');\r",
+									"        pm.expect(follower.username).to.be.a('string');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}follow/users/:other_user_handler",
+							"host": [
+								"{{base_url}}follow"
+							],
+							"path": [
+								"users",
+								":other_user_handler"
+							],
+							"variable": [
+								{
+									"key": "other_user_handler",
+									"value": "cccc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unfollow_user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}follow/users/:other_user_handler/unfollow",
+							"host": [
+								"{{base_url}}follow"
+							],
+							"path": [
+								"users",
+								":other_user_handler",
+								"unfollow"
+							],
+							"variable": [
+								{
+									"key": "other_user_handler",
+									"value": "cccc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unfollow_user test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response schema for required fields and data types\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"\r",
+									"  pm.expect(responseData).to.be.an('object');\r",
+									"  pm.expect(responseData.status).to.be.a('string');\r",
+									"  pm.expect(responseData.message).to.be.a('string');\r",
+									"  pm.expect(responseData.user_id).to.be.a('number');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}follow/users/:other_user_handler/unfollow",
+							"host": [
+								"{{base_url}}follow"
+							],
+							"path": [
+								"users",
+								":other_user_handler",
+								"unfollow"
+							],
+							"variable": [
+								{
+									"key": "other_user_handler",
+									"value": "cccc"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "get user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Content-Type is 'text/xml'\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/xml\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response body is not null\", function () {\r",
+									"  const responseData = xml2Json(pm.response.text());\r",
+									"  \r",
+									"  pm.expect(responseData).to.not.be.null;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}user/aaaa",
+							"host": [
+								"{{base_url}}user"
+							],
+							"path": [
+								"aaaa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get multiple users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Validate the response schema for the user object and its properties\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.user).to.exist.and.to.be.an('array');\r",
+									"\r",
+									"    if (responseData.user.length > 0) {\r",
+									"        responseData.user.forEach(function (user) {\r",
+									"            pm.expect(user).to.be.an('object');\r",
+									"            pm.expect(user.id).to.exist.and.to.be.a('number');\r",
+									"            pm.expect(user.name).to.exist.and.to.be.a('string');\r",
+									"            pm.expect(user.email).to.exist.and.to.match(/\\S+@\\S+\\.\\S+/);\r",
+									"            pm.expect(user.age).to.exist.and.to.be.a('number');\r",
+									"            pm.expect(user.active).to.exist.and.to.be.a('boolean');\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}user/?page_num=1&page_size=2&order_by=handler&desc=false",
+							"host": [
+								"{{base_url}}user"
+							],
+							"path": [
+								""
+							],
+							"query": [
+								{
+									"key": "page_num",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "2"
+								},
+								{
+									"key": "order_by",
+									"value": "handler"
+								},
+								{
+									"key": "desc",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"cccc@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}user/aaaa",
+							"host": [
+								"{{base_url}}user"
+							],
+							"path": [
+								"aaaa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Email content\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"cccc@gmail.com\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}user/aaaa",
+							"host": [
+								"{{base_url}}user"
+							],
+							"path": [
+								"aaaa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}user/bbbb",
+							"host": [
+								"{{base_url}}user"
+							],
+							"path": [
+								"bbbb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete user test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response schema for the deleted user\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('deletedUser');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						]
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "create post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"Amongubsdos\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}posts/",
+							"host": [
+								"{{base_url}}posts"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get posts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}posts/?page_num=1&page_size=10",
+							"host": [
+								"{{base_url}}posts"
+							],
+							"path": [
+								""
+							],
+							"query": [
+								{
+									"key": "page_num",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get post by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}posts/672129b19b964033067338b0",
+							"host": [
+								"{{base_url}}posts"
+							],
+							"path": [
+								"672129b19b964033067338b0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"content\": \"post updated\",\r\n  \"author\": \"Updated_User_123\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}posts/671fcbe0c4f2eed0bb8aec20",
+							"host": [
+								"{{base_url}}posts"
+							],
+							"path": [
+								"671fcbe0c4f2eed0bb8aec20"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "give like",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}posts/67212aff9b964033067338b2/like",
+							"host": [
+								"{{base_url}}posts"
+							],
+							"path": [
+								"67212aff9b964033067338b2",
+								"like"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}posts/672129b19b964033067338b0",
+							"host": [
+								"{{base_url}}posts"
+							],
+							"path": [
+								"672129b19b964033067338b0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "dislike",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}posts/67212aff9b964033067338b2/dislike",
+							"host": [
+								"{{base_url}}posts"
+							],
+							"path": [
+								"67212aff9b964033067338b2",
+								"dislike"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get post by user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}posts/author/Eueu?page_num=1&page_size=10",
+							"host": [
+								"{{base_url}}posts"
+							],
+							"path": [
+								"author",
+								"Eueu"
+							],
+							"query": [
+								{
+									"key": "page_num",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comments",
+			"item": [
+				{
+					"name": "Create comment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"este comnentário foi criado com handler\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}comments/create/67212aff9b964033067338b2",
+							"host": [
+								"{{base_url}}comments"
+							],
+							"path": [
+								"create",
+								"67212aff9b964033067338b2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get comments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}comments/67212aff9b964033067338b2/?page_num=1&page_size=10&order_by=date&desc=false&=",
+							"host": [
+								"{{base_url}}comments"
+							],
+							"path": [
+								"67212aff9b964033067338b2",
+								""
+							],
+							"query": [
+								{
+									"key": "page_num",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "10"
+								},
+								{
+									"key": "order_by",
+									"value": "date"
+								},
+								{
+									"key": "desc",
+									"value": "false"
+								},
+								{
+									"key": "",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit comment",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"new_comment\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}comments/edit/COMMENT_ID/",
+							"host": [
+								"{{base_url}}comments"
+							],
+							"path": [
+								"edit",
+								"COMMENT_ID",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like comment",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_handler\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}comments/like/COMMENT_ID/",
+							"host": [
+								"{{base_url}}comments"
+							],
+							"path": [
+								"like",
+								"COMMENT_ID",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dislike comment",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_handler\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}comments/dislike/COMMENT_ID",
+							"host": [
+								"{{base_url}}comments"
+							],
+							"path": [
+								"dislike",
+								"COMMENT_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete comment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}comments/delete/COMMNET_ID",
+							"host": [
+								"{{base_url}}comments"
+							],
+							"path": [
+								"delete",
+								"COMMNET_ID"
+							]
 						}
 					},
 					"response": []
