@@ -196,7 +196,13 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}register",
 							"host": [
@@ -281,7 +287,13 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}login",
 							"host": [
@@ -455,6 +467,41 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response time is within an acceptable range\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Validate the schema of the response\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.have.property('content').that.is.a('post updated');\r",
+									"\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Presence of required fields in the response\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"  \r",
+									"  pm.expect(responseData).to.be.an('object');\r",
+									"  pm.expect(responseData).to.have.property('title');\r",
+									"  pm.expect(responseData).to.have.property('body');\r",
+									"  pm.expect(responseData).to.have.property('userId');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Verify that the post ID in the response matches the requested post ID\", function () {\r",
+									"    const requestedPostID = \"671fcbe0c4f2eed0bb8aec20\";\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData._id).to.equal(requestedPostID);\r",
+									"});\r",
 									""
 								],
 								"type": "text/javascript",
