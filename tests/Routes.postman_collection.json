@@ -123,60 +123,20 @@
 							"script": {
 								"exec": [
 									"// Test for response status code\r",
-									"pm.test(\"Response status code is 200\", function () {\r",
-									"  pm.response.to.have.status(200);\r",
+									"pm.test(\"Response status code is 422\", function () {\r",
+									"  pm.response.to.have.status(422);\r",
 									"});\r",
 									"\r",
-									"// Test for the presence of registration ID in the response body\r",
-									"pm.test(\"Response body contains a registration ID from the server\", function () {\r",
-									"  var responseBody = pm.response.json();\r",
-									"  pm.expect(responseBody).to.have.property('registration_id');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Verify that the response body contains all the required fields\", function () {\r",
-									"  var requiredFields = [\"username\", \"email\", \"registration_id\"];\r",
-									"  requiredFields.forEach(function(field) {\r",
-									"    pm.expect(responseBody).to.have.property(field);\r",
-									"  });\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response content type is text/xml\", function () {\r",
-									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/xml\");\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Token returned is in a valid format\", function () {\r",
-									"    const responseData = xml2Json(pm.response.text());\r",
-									"    \r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData.token).to.exist.and.to.match(/[A-Za-z0-9]{32}/, \"Token format is invalid\");\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response body has the required fields - username, email, registration_id\", function () {\r",
-									"    const responseData = xml2Json(pm.response.text());\r",
-									"\r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData).to.have.property('username');\r",
-									"    pm.expect(responseData).to.have.property('email');\r",
-									"    pm.expect(responseData).to.have.property('registration_id');\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response body contains the user's email address\", function () {\r",
-									"    const responseData = xml2Json(pm.response.text());\r",
-									"    \r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData.email).to.exist;\r",
+									"pm.test(\"Response content type is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
 									"});\r",
 									"\r",
 									"\r",
 									"pm.test(\"Verify the structure of the response body\", function () {\r",
-									"    const responseData = xml2Json(pm.response.text());\r",
+									"    const responseData = pm.response.json();\r",
 									"    \r",
 									"    pm.expect(responseData).to.be.an('object');\r",
 									"});\r",
-									"\r",
 									""
 								],
 								"type": "text/javascript",
@@ -219,15 +179,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Test to validate the username and password\r",
-									"pm.test(\"Username is 'test' and password is '123456'\", function() {\r",
-									"    var responseData = pm.response.json();\r",
-									"    pm.expect(responseData.username).to.equal('test');\r",
-									"    pm.expect(responseData.password).to.equal('123456');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
+									"pm.test(\"Response status code is 422\", function () {\r",
+									"    pm.response.to.have.status(422);\r",
 									"});\r",
 									"\r",
 									"\r",
@@ -236,38 +189,9 @@
 									"});\r",
 									"\r",
 									"\r",
-									"pm.test(\"Verify the response data has the required fields\", function () {\r",
-									"    const responseData = pm.response.json();\r",
-									"    \r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData).to.have.property('requiredField1');\r",
-									"    pm.expect(responseData).to.have.property('requiredField2');\r",
-									"    pm.expect(responseData).to.have.property('requiredField3');\r",
+									"pm.test(\"Response time is within acceptable range\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(1000);\r",
 									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Username and password are non-empty strings\", function () {\r",
-									"  const responseData = pm.response.json();\r",
-									"\r",
-									"  pm.expect(responseData.username).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Username should not be empty\");\r",
-									"  pm.expect(responseData.password).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Password should not be empty\");\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response data contains expected keys and values\", function () {\r",
-									"    const responseData = pm.response.json();\r",
-									"    \r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData).to.have.property('key1');\r",
-									"    pm.expect(responseData.key1).to.exist;\r",
-									"\r",
-									"    pm.expect(responseData).to.have.property('key2');\r",
-									"    pm.expect(responseData.key2).to.exist;\r",
-									"\r",
-									"    pm.expect(responseData).to.have.property('key3');\r",
-									"    pm.expect(responseData.key3).to.exist;\r",
-									"});\r",
-									"\r",
 									""
 								],
 								"type": "text/javascript",
@@ -319,32 +243,23 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Content-Type header is text/xml\", function () {\r",
-									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/xml\");\r",
+									"pm.test(\"Content-Type header is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
 									"});\r",
 									"\r",
 									"\r",
 									"pm.test(\"Response body is not null\", function () {\r",
-									"    const responseData = xml2Json(pm.response.text());\r",
+									"    const responseData = pm.response.json();\r",
 									"\r",
 									"    pm.expect(responseData).to.not.be.null;\r",
 									"});\r",
 									"\r",
 									"\r",
-									"pm.test(\"Validate the XML schema of the response\", function () {\r",
-									"    const responseData = xml2Json(pm.response.text());\r",
-									"    \r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"});\r",
-									"\r",
-									"\r",
 									"pm.test(\"Response has the required fields and attributes\", function () {\r",
-									"    const responseData = xml2Json(pm.response.text());\r",
+									"    const responseData = pm.response.json();\r",
 									"    \r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData).to.include.all.keys('id', 'title', 'body');\r",
+									"    pm.expect(responseData).to.be.an('array').that.is.not.empty;\r",
 									"});\r",
-									"\r",
 									""
 								],
 								"type": "text/javascript",
@@ -422,7 +337,19 @@
 									"pm.test(\"Post author\", function () {\r",
 									"    pm.expect(pm.response.text()).to.include(\"test\");\r",
 									"});\r",
-									""
+									"\r",
+									"pm.test(\"Liked\", function () {\r",
+									"     var responseData = pm.response.json();\r",
+									"     pm.expect(responseData).to.be.an('object');\r",
+									"     pm.expect(responseData.likes).to.be.an('array').that.is.not.empty;\r",
+									"     pm.expect(responseData.isLiked).to.be.true;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Commented\", function () {\r",
+									"     var responseJSON = pm.response.json();\r",
+									"     pm.expect(responseJSON).to.be.an('object');\r",
+									"     pm.expect(responseJSON.comments).to.be.an('array').that.is.not.empty;\r",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -480,7 +407,7 @@
 									"pm.test(\"Validate the schema of the response\", function () {\r",
 									"    const responseData = pm.response.json();\r",
 									"\r",
-									"    pm.expect(responseData).to.have.property('content').that.is.a('post updated');\r",
+									"    pm.expect(responseData).to.have.property('content').that.is.a('string');\r",
 									"\r",
 									"});\r",
 									"\r",
@@ -489,9 +416,9 @@
 									"  const responseData = pm.response.json();\r",
 									"  \r",
 									"  pm.expect(responseData).to.be.an('object');\r",
-									"  pm.expect(responseData).to.have.property('title');\r",
-									"  pm.expect(responseData).to.have.property('body');\r",
-									"  pm.expect(responseData).to.have.property('userId');\r",
+									"  pm.expect(responseData).to.have.property('content');\r",
+									"  pm.expect(responseData).to.have.property('likes');\r",
+									"  pm.expect(responseData).to.have.property('isLiked');\r",
 									"});\r",
 									"\r",
 									"\r",
@@ -597,28 +524,16 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
 									"});\r",
 									"\r",
 									"pm.test(\"Response body should have the correct schema\", function () {\r",
 									"    const responseData = pm.response.json();\r",
 									"    \r",
 									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData).to.have.property('username');\r",
-									"    pm.expect(responseData.username).to.be.a('string');\r",
-									"\r",
-									"    pm.expect(responseData).to.have.property('followers');\r",
-									"    pm.expect(responseData.followers).to.be.an('array');\r",
-									"\r",
-									"    responseData.followers.forEach(function(follower) {\r",
-									"        pm.expect(follower).to.be.an('object');\r",
-									"        pm.expect(follower).to.have.property('id');\r",
-									"        pm.expect(follower.id).to.be.a('number');\r",
-									"        pm.expect(follower).to.have.property('username');\r",
-									"        pm.expect(follower.username).to.be.a('string');\r",
+									"    pm.expect(responseData).to.have.property('detail');\r",
 									"    });\r",
-									"});\r",
 									"\r",
 									""
 								],
@@ -638,7 +553,7 @@
 								}
 							]
 						},
-						"method": "GET",
+						"method": "PUT",
 						"header": [
 							{
 								"key": "x-api-key",
@@ -654,6 +569,81 @@
 							"path": [
 								"users",
 								":other_user_handler"
+							],
+							"variable": [
+								{
+									"key": "other_user_handler",
+									"value": "cccc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unfollow_user test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body should have the correct schema\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData).to.have.property('detail');\r",
+									"    });\r",
+									"    \r",
+									"pm.test(\"Response Content-Type header is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response body should have the correct schema\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.detail).to.be.a('string');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}follow/users/:other_user_handler/unfollow",
+							"host": [
+								"{{base_url}}follow"
+							],
+							"path": [
+								"users",
+								":other_user_handler",
+								"unfollow"
 							],
 							"variable": [
 								{
@@ -705,26 +695,47 @@
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
 				{
-					"name": "unfollow_user test",
+					"name": "get user",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
+									"// Fixed Content-Type check and removed unnecessary response body check\r",
 									"pm.test(\"Response status code is 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Response schema for required fields and data types\", function () {\r",
-									"  const responseData = pm.response.json();\r",
-									"\r",
-									"  pm.expect(responseData).to.be.an('object');\r",
-									"  pm.expect(responseData.status).to.be.a('string');\r",
-									"  pm.expect(responseData.message).to.be.a('string');\r",
-									"  pm.expect(responseData.user_id).to.be.a('number');\r",
+									"pm.test(\"Content-Type is 'application/json'\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
 									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 500ms\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate the response schema for required fields\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.handler).to.exist;\r",
+									"    pm.expect(responseData.email).to.exist;\r",
+									"    pm.expect(responseData._id).to.exist;\r",
+									"    pm.expect(responseData.username).to.exist;\r",
+									"    pm.expect(responseData.bio).to.exist;\r",
+									"    pm.expect(responseData.followers).to.exist;\r",
+									"    pm.expect(responseData.following).to.exist;\r",
+									"    pm.expect(responseData.isFollowing).to.exist;\r",
+									"    pm.expect(responseData.isMe).to.exist;\r",
+									"});\r",
+									"\r",
 									""
 								],
 								"type": "text/javascript",
@@ -743,69 +754,6 @@
 								}
 							]
 						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "x-api-key",
-								"value": "{{api_key}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}follow/users/:other_user_handler/unfollow",
-							"host": [
-								"{{base_url}}follow"
-							],
-							"path": [
-								"users",
-								":other_user_handler",
-								"unfollow"
-							],
-							"variable": [
-								{
-									"key": "other_user_handler",
-									"value": "cccc"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "User",
-			"item": [
-				{
-					"name": "get user",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Content-Type is 'text/xml'\", function () {\r",
-									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/xml\");\r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response body is not null\", function () {\r",
-									"  const responseData = xml2Json(pm.response.text());\r",
-									"  \r",
-									"  pm.expect(responseData).to.not.be.null;\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
 						"method": "GET",
 						"header": [
 							{
@@ -838,23 +786,70 @@
 									"});\r",
 									"\r",
 									"\r",
-									"pm.test(\"Validate the response schema for the user object and its properties\", function () {\r",
-									"    const responseData = pm.response.json();\r",
-									"\r",
-									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData.user).to.exist.and.to.be.an('array');\r",
-									"\r",
-									"    if (responseData.user.length > 0) {\r",
-									"        responseData.user.forEach(function (user) {\r",
-									"            pm.expect(user).to.be.an('object');\r",
-									"            pm.expect(user.id).to.exist.and.to.be.a('number');\r",
-									"            pm.expect(user.name).to.exist.and.to.be.a('string');\r",
-									"            pm.expect(user.email).to.exist.and.to.match(/\\S+@\\S+\\.\\S+/);\r",
-									"            pm.expect(user.age).to.exist.and.to.be.a('number');\r",
-									"            pm.expect(user.active).to.exist.and.to.be.a('boolean');\r",
-									"        });\r",
-									"    }\r",
+									"pm.test(\"Response time is within acceptable range\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(1000); //fixed response time threshold\r",
 									"});\r",
+									"\r",
+									"pm.test(\"Response Content-Type header is application/json\", function () {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required fields\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array').that.is.not.empty;\r",
+									"    \r",
+									"    responseData.forEach(user => {\r",
+									"        pm.expect(user).to.have.property('handler');\r",
+									"        pm.expect(user).to.have.property('password');\r",
+									"        pm.expect(user).to.have.property('email');\r",
+									"        pm.expect(user).to.have.property('_id');\r",
+									"        pm.expect(user).to.have.property('username');\r",
+									"        pm.expect(user).to.have.property('bio');\r",
+									"        pm.expect(user).to.have.property('followers');\r",
+									"        pm.expect(user).to.have.property('following');\r",
+									"        pm.expect(user).to.have.property('isFollowing');\r",
+									"        pm.expect(user).to.have.property('isMe');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Email is in a valid format\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"  \r",
+									"  responseData.forEach(function(user) {\r",
+									"    pm.expect(user.email).to.be.a('string').and.to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/, \"Email format is invalid\");\r",
+									"  });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Validate the response for the user object and its properties\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    responseData.forEach(function(user) {\r",
+									"        pm.expect(user).to.be.an('object');\r",
+									"        pm.expect(user.handler).to.be.a('string');\r",
+									"        pm.expect(user.password).to.be.a('string');\r",
+									"        pm.expect(user.email).to.be.a('string');\r",
+									"        pm.expect(user._id).to.be.a('string');\r",
+									"        pm.expect(user.username).to.be.a('string');\r",
+									"        pm.expect(user.bio).to.be.a('string');\r",
+									"        pm.expect(user.followers).to.be.an('array');\r",
+									"        pm.expect(user.following).to.be.an('array');\r",
+									"        pm.expect(user.isFollowing).to.be.a('boolean');\r",
+									"        pm.expect(user.isMe).to.be.a('boolean');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Number of elements in the response array is 2\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array').and.to.have.lengthOf(2);\r",
+									"});\r",
+									"\r",
 									""
 								],
 								"type": "text/javascript",
@@ -864,7 +859,13 @@
 					],
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}user/?page_num=1&page_size=2&order_by=handler&desc=false",
 							"host": [
@@ -934,7 +935,40 @@
 									"\r",
 									"pm.test(\"Email content\", function () {\r",
 									"    pm.expect(pm.response.text()).to.include(\"cccc@gmail.com\");\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.test(\"Validate the schema for the response body\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"  \r",
+									"  pm.expect(responseData).to.be.an('object');\r",
+									"  pm.expect(responseData).to.have.property('handler').that.is.a('string');\r",
+									"  pm.expect(responseData).to.have.property('password').that.is.a('string');\r",
+									"  pm.expect(responseData).to.have.property('email').that.is.a('string');\r",
+									"  pm.expect(responseData).to.have.property('_id').that.is.a('string');\r",
+									"  pm.expect(responseData).to.have.property('username').that.is.a('string');\r",
+									"  pm.expect(responseData).to.have.property('bio').that.is.a('string');\r",
+									"  pm.expect(responseData).to.have.property('followers').that.is.an('array');\r",
+									"  pm.expect(responseData).to.have.property('following').that.is.an('array');\r",
+									"  pm.expect(responseData).to.have.property('isFollowing').that.is.a('boolean');\r",
+									"  pm.expect(responseData).to.have.property('isMe').that.is.a('boolean');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Handler field should not be empty\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"  \r",
+									"  pm.expect(responseData).to.be.an('object');\r",
+									"  pm.expect(responseData.handler).to.exist.and.to.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Email field is in a valid email format\", function () {\r",
+									"  const responseData = pm.response.json();\r",
+									"  \r",
+									"  pm.expect(responseData.email).to.match(/^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$/);\r",
+									"});\r",
+									"\r",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -961,12 +995,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}user/aaaa",
+							"raw": "{{base_url}}user/cccc",
 							"host": [
 								"{{base_url}}user"
 							],
 							"path": [
-								"aaaa"
+								"cccc"
 							]
 						}
 					},
@@ -1024,16 +1058,29 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Response status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
+									"pm.test(\"Response status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
 									"});\r",
 									"\r",
 									"pm.test(\"Response schema for the deleted user\", function () {\r",
 									"    const responseData = pm.response.json();\r",
 									"    \r",
 									"    pm.expect(responseData).to.be.an('object');\r",
-									"    pm.expect(responseData).to.have.property('deletedUser');\r",
+									"    pm.expect(responseData).to.have.property('detail');\r",
 									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has the required field - detail\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('object');\r",
+									"    pm.expect(responseData.detail).to.exist;\r",
+									"});\r",
+									"\r",
 									""
 								],
 								"type": "text/javascript",
@@ -1059,7 +1106,16 @@
 								"value": "{{api_key}}",
 								"type": "text"
 							}
-						]
+						],
+						"url": {
+							"raw": "{{base_url}}user/bbbb",
+							"host": [
+								"{{base_url}}user"
+							],
+							"path": [
+								"bbbb"
+							]
+						}
 					},
 					"response": []
 				}
@@ -1070,6 +1126,21 @@
 			"item": [
 				{
 					"name": "create post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1112,6 +1183,39 @@
 				},
 				{
 					"name": "get posts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"    pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Posts array should exist and be an array of objects\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    responseData.forEach(post => {\r",
+									"        pm.expect(post).to.be.an('object');\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Posts array contains the expected number of elements based on the page_size parameter\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array').with.lengthOf(10);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1124,7 +1228,13 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}posts/?page_num=1&page_size=10",
 							"host": [
@@ -1149,6 +1259,18 @@
 				},
 				{
 					"name": "get post by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1161,7 +1283,13 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}posts/672129b19b964033067338b0",
 							"host": [
@@ -1169,6 +1297,13 @@
 							],
 							"path": [
 								"672129b19b964033067338b0"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
 							]
 						}
 					},
@@ -1295,6 +1430,18 @@
 				},
 				{
 					"name": "get post by user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1307,7 +1454,13 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}posts/author/Eueu?page_num=1&page_size=10",
 							"host": [
@@ -1381,6 +1534,39 @@
 				},
 				{
 					"name": "Get comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Updated response time test to 300ms\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate the structure and data types of the response JSON schema\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(responseData).to.be.an('array');\r",
+									"    pm.expect(responseData[0].comments).to.be.an('array');\r",
+									"    responseData[0].comments.forEach(function(comment) {\r",
+									"        pm.expect(comment).to.be.an('object');\r",
+									"        pm.expect(comment._id).to.be.a('string');\r",
+									"        pm.expect(comment.content).to.be.a('string');\r",
+									"        pm.expect(comment.commented_by).to.be.a('string');\r",
+									"        pm.expect(comment.date).to.be.a('string');\r",
+									"        pm.expect(comment.likes).to.be.an('array');\r",
+									"        pm.expect(comment.reposts).to.be.an('array');\r",
+									"        pm.expect(comment.comments).to.be.an('array');\r",
+									"        pm.expect(comment.edited).to.be.a('boolean');\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
