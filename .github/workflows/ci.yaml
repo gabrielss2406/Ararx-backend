@@ -42,10 +42,16 @@ jobs:
         run: |
           source venv/bin/activate
           python -m uvicorn api.api:app --host 0.0.0.0 --port 8000 &
-          sleep 5
+          sleep 7
 
-      - name: Install Newman
-        run: npm install -g newman
+      - name: Install Newman with html reporter
+        run: npm install -g newman newman-reporter-html
 
-      - name: Run Postman tests with environment
-        run: newman run tests/Routes.postman_collection.json -e tests/local.postman_environment.json
+      - name: Run Postman tests with environment and generate report
+        run: newman run tests/Routes.postman_collection.json -e tests/local.postman_environment.json --reporters cli,html --reporter-html-export tests/reports/report.html
+
+      - name: Upload HTML report as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-report
+          path: tests/reports/report.html

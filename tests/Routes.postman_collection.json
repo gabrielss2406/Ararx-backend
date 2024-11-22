@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "5d3d7cd8-ecbb-4459-8211-482feec163e2",
+		"_postman_id": "cb5d2fef-5793-40bb-9589-3105d6a50007",
 		"name": "Routes",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "33378175",
-		"_collection_link": "https://red-zodiac-879129.postman.co/workspace/C214---LAB~317bbc56-819b-4922-8105-3b3016a208ba/collection/27612938-5d3d7cd8-ecbb-4459-8211-482feec163e2?action=share&source=collection_link&creator=33378175"
+		"_collection_link": "https://red-zodiac-879129.postman.co/workspace/C214---LAB~317bbc56-819b-4922-8105-3b3016a208ba/collection/33378175-cb5d2fef-5793-40bb-9589-3105d6a50007?action=share&source=collection_link&creator=33378175"
 	},
 	"item": [
 		{
@@ -1125,63 +1125,6 @@
 			"name": "Posts",
 			"item": [
 				{
-					"name": "create post",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response status code is 200\", function () {\r",
-									"  pm.response.to.have.status(200);\r",
-									"});\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwt_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "x-api-key",
-								"value": "{{api_key}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"content\": \"Amongubsdos\"\r\n}\r\n\r\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}posts/",
-							"host": [
-								"{{base_url}}posts"
-							],
-							"path": [
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "get posts",
 					"event": [
 						{
@@ -1489,49 +1432,6 @@
 		{
 			"name": "Comments",
 			"item": [
-				{
-					"name": "Create comment",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwt_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "x-api-key",
-								"value": "{{api_key}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"content\": \"este comnentário foi criado com handler\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}comments/create/67212aff9b964033067338b2",
-							"host": [
-								"{{base_url}}comments"
-							],
-							"path": [
-								"create",
-								"67212aff9b964033067338b2"
-							]
-						}
-					},
-					"response": []
-				},
 				{
 					"name": "Get comments",
 					"event": [
