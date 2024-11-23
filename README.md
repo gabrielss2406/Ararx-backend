@@ -51,9 +51,9 @@ Para rodar esse projeto, você vai precisar adicionar as seguintes variáveis de
 `APP_HOST`
 
 ## 🔗 Projetos Relacionados
-Este projeto é consumido por um frontend, que também faz parte do projeto da disciplina. Confira o Frontend do Ararx:
+Este projeto é consumido por uma aplicação web, que também faz parte do projeto da disciplina. Confira o Frontend do Ararx:
 
-- [Ararex Frontend](https://github.com/gabrielss2406/Ararx-Frontend)
+- [Ararx Frontend](https://github.com/gabrielss2406/Ararx-Frontend)
 
 
 ## 👥 Autores
