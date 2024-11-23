@@ -45,7 +45,7 @@ Para rodar esse projeto, você vai precisar adicionar as seguintes variáveis de
 ## 🔗 Projetos Relacionados
 Este projeto consome uma API desenvolvida para a mesma disciplina. Confira o Frontend do Ararx:
 
-- [Ararex Backend](https://github.com/markinh00/C214-Ararx-backend)
+- [Ararex Frontend](https://github.com/gabrielss2406/Ararx-Frontend)
 
 
 ## 👥 Autores
