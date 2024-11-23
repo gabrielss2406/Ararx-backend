@@ -1,5 +1,5 @@
 # C214-Ararx-backend
-Atividade prática de C214-L1
+Atividade prática de C214-L1. Criamos uma versão minimalista do famoso site X (antigo twitter), onde é possível criar posts, comentar, seguir usuários, dar likes, etc.
 
 ## Rodando os testes
 Para instalar as dependências do projeto
