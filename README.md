@@ -29,12 +29,12 @@ Para rodar o servidor use o comando abaixo:
 ```
 
 ## 🚀Rodando os testes
-Estando com o projeto rodando, teremos que instalar outras ferramentas
+Para instalar as ferramentas
 ```bash
   npm install -g newman newman-reporter-html
 ```
 
-Para rodar os testes gerando o relatório no prompt e em um html
+Estando com o projeto rodando. Para rodar os testes gerando o relatório no prompt e em um html
 ```bash
   newman run tests/Routes.postman_collection.json -e tests/local.postman_environment.json --reporters cli,html --reporter-html-export tests/reports/report.html
 ```
