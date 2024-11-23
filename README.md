@@ -29,7 +29,7 @@ Para rodar o servidor use o comando abaixo:
 ```
 
 ## 🚀Rodando os testes
-Para instalar as ferramentas
+Estando com o projeto rodando, teremos que instalar outras ferramentas
 ```bash
   npm install -g newman newman-reporter-html
 ```
