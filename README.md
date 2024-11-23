@@ -4,7 +4,7 @@
 Atividade prática de C214-L1. Criamos uma versão minimalista do famoso site X (antigo twitter), onde é possível criar posts, comentar, seguir usuários, dar likes, etc.
 
 
-## 🌟Funcionalidades
+## 🌟 Funcionalidades
 
 - 🔐 Registro e login de usuários
 - 📝 Publicação de posts com texto
@@ -15,9 +15,10 @@ Atividade prática de C214-L1. Criamos uma versão minimalista do famoso site X 
 - ➕ Seguir outros usuários
 
 ## 🛠️ Stack utilizada
-**back end:** Python, FastAPI
+**Backend:** Python, FastAPI
+**Database:** MongoDB
 
-## Rodando os testes
+## 🚀 Instalação e execução local
 Para instalar as dependências do projeto
 ```bash
   pip install -r requirements.txt
@@ -27,11 +28,18 @@ Para rodar o servidor use o comando abaixo:
   python -m uvicorn api.api:app --reload
 ```
 
+## 🚀Rodando os testes
+Para instalar as ferramentas
+```bash
+  npm install -g newman newman-reporter-html
+```
+
+Para rodar os testes gerando o relatório no prompt e em um html
+```bash
+  newman run tests/Routes.postman_collection.json -e tests/local.postman_environment.json --reporters cli,html --reporter-html-export tests/reports/report.html
+```
+
 ## 🔧 Variáveis de Ambiente
-Para rodar esse projeto, você vai precisar adicionar as seguintes variáveis de ambiente no seu .env
-
-
-## Variáveis de Ambiente
 
 Para rodar esse projeto, você vai precisar adicionar as seguintes variáveis de ambiente no seu .env
 
@@ -43,7 +51,7 @@ Para rodar esse projeto, você vai precisar adicionar as seguintes variáveis de
 `APP_HOST`
 
 ## 🔗 Projetos Relacionados
-Este projeto consome uma API desenvolvida para a mesma disciplina. Confira o Frontend do Ararx:
+Este projeto é consumido por um frontend, que também faz parte do projeto da disciplina. Confira o Frontend do Ararx:
 
 - [Ararex Frontend](https://github.com/gabrielss2406/Ararx-Frontend)
 
@@ -51,5 +59,7 @@ Este projeto consome uma API desenvolvida para a mesma disciplina. Confira o Fro
 ## 👥 Autores
 - [Samuel Freitas](https://github.com/SamuelFreitasSoares)
 - [João Marcos](https://github.com/markinh00)
+- [Gabriel Siqueira](https://github.com/gabrielss2406/)
+- [Ewel - (Testes)](https://github.com/Ewel10/)
 
 
