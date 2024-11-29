@@ -16,7 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(test.router)
 app.include_router(register.router)
 app.include_router(login.router)
 app.include_router(post.router)
